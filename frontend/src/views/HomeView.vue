@@ -1,13 +1,66 @@
 <script setup lang="ts">
-// 홈페이지 로직
+import { computed } from 'vue'
+
+// 현재 날짜와 시간 정보
+const today = computed(() => {
+  const now = new Date()
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'long'
+  }
+  return now.toLocaleDateString('ko-KR', options)
+})
+
+const currentTime = computed(() => {
+  const now = new Date()
+  return now.toLocaleTimeString('ko-KR', { 
+    hour: '2-digit', 
+    minute: '2-digit',
+    hour12: false
+  })
+})
+
+const greeting = computed(() => {
+  const hour = new Date().getHours()
+  if (hour < 12) return '좋은 아침입니다! ☀️'
+  if (hour < 18) return '좋은 오후입니다! 🌤️'
+  return '좋은 저녁입니다! 🌙'
+})
 </script>
 
 <template>
   <div class="space-y-6">
-    <!-- Welcome Section -->
-    <div>
-      <h2 class="text-3xl font-bold text-gray-900 mb-2">안녕하세요! TS팀 포탈입니다 🎉</h2>
-      <p class="text-gray-600">Saltware CSG TS팀의 모든 정보를 한곳에서 확인하세요.</p>
+    <!-- Welcome Section with Date/Time -->
+    <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 text-white">
+      <div class="flex justify-between items-start">
+        <div>
+          <h2 class="text-3xl font-bold mb-2">{{ greeting }}</h2>
+          <p class="text-blue-100 mb-4">Saltware CSG TS팀의 모든 정보를 한곳에서 확인하세요.</p>
+          <div class="flex items-center space-x-4 text-sm text-blue-100">
+            <div class="flex items-center space-x-2">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span>{{ today }}</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{{ currentTime }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="hidden md:block">
+          <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+            <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m11 0a2 2 0 01-2 2H7a2 2 0 01-2-2m2-2h2m8 0h2" />
+            </svg>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Dashboard Cards -->
@@ -15,11 +68,11 @@
       <!-- AWS 꿀팁 카드 -->
       <router-link 
         to="/aws-tips"
-        class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow cursor-pointer"
+        class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 transform"
       >
         <div class="flex items-center mb-4">
-          <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-            <svg class="w-6 h-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center shadow-lg">
+            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
             </svg>
           </div>
@@ -28,19 +81,24 @@
         <p class="text-gray-600 text-sm mb-4">
           매일 업데이트되는 AWS 서비스 활용 팁과 모범 사례들을 확인해보세요.
         </p>
-        <div class="flex items-center text-blue-600 text-sm font-medium">
-          더 보기 →
+        <div class="flex items-center justify-between">
+          <div class="flex items-center text-orange-600 text-sm font-medium">
+            더 보기 →
+          </div>
+          <div class="bg-orange-100 text-orange-600 text-xs px-2 py-1 rounded-full font-medium">
+            NEW
+          </div>
         </div>
       </router-link>
 
       <!-- TS 주요 이벤트 카드 -->
       <router-link 
         to="/events"
-        class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow cursor-pointer"
+        class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 transform"
       >
         <div class="flex items-center mb-4">
-          <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-            <svg class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
@@ -57,11 +115,11 @@
       <!-- 오늘의 점심 추천 카드 -->
       <router-link 
         to="/lunch"
-        class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow cursor-pointer"
+        class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 transform"
       >
         <div class="flex items-center mb-4">
-          <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-            <svg class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center shadow-lg">
+            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.832 18.477 19.246 18 17.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
           </div>
@@ -70,10 +128,34 @@
         <p class="text-gray-600 text-sm mb-4">
           주변 맛집 정보와 팀원들의 추천 메뉴를 확인하고 점심 고민을 해결하세요.
         </p>
-        <div class="flex items-center text-blue-600 text-sm font-medium">
+        <div class="flex items-center text-green-600 text-sm font-medium">
           더 보기 →
         </div>
       </router-link>
+    </div>
+
+    <!-- Quick Stats Section -->
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+        <svg class="w-5 h-5 text-gray-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        오늘의 요약
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="text-center p-4 bg-gray-50 rounded-lg">
+          <div class="text-2xl font-bold text-orange-600 mb-1">1</div>
+          <div class="text-sm text-gray-600">AWS 팁</div>
+        </div>
+        <div class="text-center p-4 bg-gray-50 rounded-lg">
+          <div class="text-2xl font-bold text-blue-600 mb-1">-</div>
+          <div class="text-sm text-gray-600">예정된 이벤트</div>
+        </div>
+        <div class="text-center p-4 bg-gray-50 rounded-lg">
+          <div class="text-2xl font-bold text-green-600 mb-1">∞</div>
+          <div class="text-sm text-gray-600">점심 선택지</div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
