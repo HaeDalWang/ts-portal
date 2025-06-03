@@ -15,9 +15,9 @@ const router = createRouter({
       component: () => import('../views/AwsTipsView.vue'),
     },
     {
-      path: '/events',
-      name: 'events',
-      component: () => import('../views/EventsView.vue'),
+      path: '/notices',
+      name: 'notices',
+      component: () => import('../views/NoticesView.vue'),
     },
     {
       path: '/lunch',

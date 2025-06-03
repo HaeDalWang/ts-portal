@@ -109,7 +109,7 @@ const toggleSidebarCollapse = () => {
                   isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'
                 ]"
               >
-                오늘의 AWS 꿀팁
+                오늘의 AWS 소식
               </span>
             </router-link>
             <!-- 툴팁 -->

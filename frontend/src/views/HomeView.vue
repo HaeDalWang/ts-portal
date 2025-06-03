@@ -65,7 +65,7 @@ const greeting = computed(() => {
 
     <!-- Dashboard Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- AWS 꿀팁 카드 -->
+      <!-- AWS 서비스 카드 -->
       <router-link 
         to="/aws-tips"
         class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 transform"
@@ -76,7 +76,7 @@ const greeting = computed(() => {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
             </svg>
           </div>
-          <h3 class="text-xl font-semibold text-gray-900 ml-3">오늘의 AWS 꿀팁</h3>
+          <h3 class="text-xl font-semibold text-gray-900 ml-3">오늘의 AWS 소식</h3>
         </div>
         <p class="text-gray-600 text-sm mb-4">
           매일 업데이트되는 AWS 서비스 활용 팁과 모범 사례들을 확인해보세요.
@@ -91,24 +91,29 @@ const greeting = computed(() => {
         </div>
       </router-link>
 
-      <!-- TS 주요 이벤트 카드 -->
+      <!-- TS 공지사항 카드 -->
       <router-link 
-        to="/events"
+        to="/notices"
         class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 transform"
       >
         <div class="flex items-center mb-4">
           <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
             <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
             </svg>
           </div>
-          <h3 class="text-xl font-semibold text-gray-900 ml-3">TS 주요 이벤트</h3>
+          <h3 class="text-xl font-semibold text-gray-900 ml-3">TS 공지사항</h3>
         </div>
         <p class="text-gray-600 text-sm mb-4">
-          팀 회의, 교육 세션, 중요 마일스톤 등 놓치면 안 되는 이벤트들을 확인하세요.
+          팀장님의 중요 공지사항과 주의사항들을 확인하고 놓치지 마세요.
         </p>
-        <div class="flex items-center text-blue-600 text-sm font-medium">
-          더 보기 →
+        <div class="flex items-center justify-between">
+          <div class="flex items-center text-blue-600 text-sm font-medium">
+            더 보기 →
+          </div>
+          <div class="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full font-medium">
+            중요
+          </div>
         </div>
       </router-link>
 
@@ -148,8 +153,8 @@ const greeting = computed(() => {
           <div class="text-sm text-gray-600">AWS 팁</div>
         </div>
         <div class="text-center p-4 bg-gray-50 rounded-lg">
-          <div class="text-2xl font-bold text-blue-600 mb-1">-</div>
-          <div class="text-sm text-gray-600">예정된 이벤트</div>
+          <div class="text-2xl font-bold text-blue-600 mb-1">2</div>
+          <div class="text-sm text-gray-600">미확인 공지</div>
         </div>
         <div class="text-center p-4 bg-gray-50 rounded-lg">
           <div class="text-2xl font-bold text-green-600 mb-1">∞</div>

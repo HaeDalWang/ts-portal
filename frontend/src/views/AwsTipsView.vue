@@ -318,7 +318,7 @@ const toggleTranslation = () => {
 </template>
 
 <style scoped>
-/* AWS 꿀팁 페이지 전용 스타일 */
+/* AWS 서비스팁 페이지 전용 스타일 */
 .prose {
   line-height: 1.7;
 }
