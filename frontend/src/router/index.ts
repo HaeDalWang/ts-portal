@@ -24,6 +24,21 @@ const router = createRouter({
       name: 'lunch',
       component: () => import('../views/LunchView.vue'),
     },
+    {
+      path: '/team',
+      name: 'team',
+      component: () => import('../views/TeamView.vue'),
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: () => import('../views/DashboardView.vue'),
+    },
+    {
+      path: '/msp',
+      name: 'msp',
+      component: () => import('../views/MspView.vue'),
+    },
   ],
 })
 

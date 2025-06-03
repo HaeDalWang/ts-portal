@@ -21,33 +21,52 @@ const toggleSidebarCollapse = () => {
     >
       <!-- 사이드바 헤더 -->
       <div :class="['flex items-center h-16 border-b border-gray-200', isSidebarCollapsed ? 'justify-center px-2' : 'justify-between px-4']">
-        <h1 
-          :class="[
-            'font-bold text-gray-900 transition-all duration-300',
-            isSidebarCollapsed ? 'opacity-0 text-sm' : 'opacity-100 text-xl'
-          ]"
-        >
-          <span class="text-blue-600">TS</span><span :class="isSidebarCollapsed ? 'hidden' : ''"> - 포탈</span>
-        </h1>
+        <div class="flex items-center">
+          <!-- CSS 로고 -->
+          <div 
+            :class="[
+              'flex items-center justify-center font-bold text-white rounded-lg shadow-md transition-all duration-300',
+              'bg-gradient-to-br from-blue-500 to-blue-600',
+              'w-8 h-8 text-xs'
+            ]"
+          >
+            TS
+          </div>
+        </div>
 
         <!-- 접기/펴기 버튼 -->
         <button
+          v-if="!isSidebarCollapsed"
           @click="toggleSidebarCollapse"
           :class="[
-            'p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition-colors',
-            isSidebarCollapsed ? 'p-3' : ''
+            'p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition-colors'
           ]"
         >
           <svg 
             :class="[
-              'w-5 h-5 transition-transform duration-300',
-              isSidebarCollapsed ? 'rotate-180' : ''
+              'w-5 h-5 transition-transform duration-300'
             ]" 
             fill="none" 
             viewBox="0 0 24 24" 
             stroke="currentColor"
           >
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+          </svg>
+        </button>
+        
+        <!-- 접힌 상태에서 클릭 가능한 전체 영역 -->
+        <button
+          v-if="isSidebarCollapsed"
+          @click="toggleSidebarCollapse"
+          class="w-full h-full flex items-center justify-center hover:bg-gray-50 transition-colors"
+        >
+          <svg 
+            class="w-4 h-4 text-gray-400" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
           </svg>
         </button>
       </div>
@@ -88,7 +107,7 @@ const toggleSidebarCollapse = () => {
             </div>
           </div>
 
-          <!-- AWS 꿀팁 -->
+          <!-- AWS 소식 -->
           <div class="relative group">
             <router-link
               to="/aws-tips"
@@ -117,24 +136,24 @@ const toggleSidebarCollapse = () => {
               v-if="isSidebarCollapsed"
               class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50"
             >
-              오늘의 AWS 꿀팁
+              오늘의 AWS 소식
             </div>
           </div>
 
-          <!-- TS 이벤트 -->
+          <!-- TS 공지사항 -->
           <div class="relative group">
             <router-link
-              to="/events"
+              to="/notices"
               :class="[
                 'flex items-center text-sm font-medium rounded-lg transition-all duration-200',
                 isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3',
-                route.name === 'events' 
+                route.name === 'notices' 
                   ? 'bg-blue-100 text-blue-700' 
                   : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
               ]"
             >
               <svg class="w-5 h-5 flex-shrink-0" :class="isSidebarCollapsed ? '' : 'mr-3'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
               </svg>
               <span 
                 :class="[
@@ -142,7 +161,7 @@ const toggleSidebarCollapse = () => {
                   isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'
                 ]"
               >
-                TS 주요 이벤트
+                TS 공지사항
               </span>
             </router-link>
             <!-- 툴팁 -->
@@ -150,7 +169,7 @@ const toggleSidebarCollapse = () => {
               v-if="isSidebarCollapsed"
               class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50"
             >
-              TS 주요 이벤트
+              TS 공지사항
             </div>
           </div>
 
@@ -184,6 +203,108 @@ const toggleSidebarCollapse = () => {
               class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50"
             >
               오늘의 점심 추천
+            </div>
+          </div>
+
+          <!-- 구분선 -->
+          <div :class="['border-t border-gray-200 my-4', isSidebarCollapsed ? 'mx-2' : 'mx-0']"></div>
+
+          <!-- 팀원 프로필 -->
+          <div class="relative group">
+            <router-link
+              to="/team"
+              :class="[
+                'flex items-center text-sm font-medium rounded-lg transition-all duration-200',
+                isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3',
+                route.name === 'team' 
+                  ? 'bg-purple-100 text-purple-700' 
+                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+              ]"
+            >
+              <svg class="w-5 h-5 flex-shrink-0" :class="isSidebarCollapsed ? '' : 'mr-3'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <span 
+                :class="[
+                  'transition-all duration-300',
+                  isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'
+                ]"
+              >
+                팀원 프로필
+              </span>
+            </router-link>
+            <!-- 툴팁 -->
+            <div 
+              v-if="isSidebarCollapsed"
+              class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50"
+            >
+              팀원 프로필
+            </div>
+          </div>
+
+          <!-- 팀 대시보드 -->
+          <div class="relative group">
+            <router-link
+              to="/dashboard"
+              :class="[
+                'flex items-center text-sm font-medium rounded-lg transition-all duration-200',
+                isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3',
+                route.name === 'dashboard' 
+                  ? 'bg-indigo-100 text-indigo-700' 
+                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+              ]"
+            >
+              <svg class="w-5 h-5 flex-shrink-0" :class="isSidebarCollapsed ? '' : 'mr-3'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span 
+                :class="[
+                  'transition-all duration-300',
+                  isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'
+                ]"
+              >
+                팀 대시보드
+              </span>
+            </router-link>
+            <!-- 툴팁 -->
+            <div 
+              v-if="isSidebarCollapsed"
+              class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50"
+            >
+              팀 대시보드
+            </div>
+          </div>
+
+          <!-- MSP 관리 -->
+          <div class="relative group">
+            <router-link
+              to="/msp"
+              :class="[
+                'flex items-center text-sm font-medium rounded-lg transition-all duration-200',
+                isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3',
+                route.name === 'msp' 
+                  ? 'bg-teal-100 text-teal-700' 
+                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+              ]"
+            >
+              <svg class="w-5 h-5 flex-shrink-0" :class="isSidebarCollapsed ? '' : 'mr-3'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m11 0a2 2 0 01-2 2H7a2 2 0 01-2-2m2-2h2m8 0h2" />
+              </svg>
+              <span 
+                :class="[
+                  'transition-all duration-300',
+                  isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'
+                ]"
+              >
+                MSP 관리
+              </span>
+            </router-link>
+            <!-- 툴팁 -->
+            <div 
+              v-if="isSidebarCollapsed"
+              class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50"
+            >
+              MSP 관리
             </div>
           </div>
         </div>

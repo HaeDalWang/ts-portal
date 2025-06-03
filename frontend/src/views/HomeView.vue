@@ -137,6 +137,69 @@ const greeting = computed(() => {
           더 보기 →
         </div>
       </router-link>
+
+      <!-- 팀원 프로필 카드 -->
+      <router-link 
+        to="/team"
+        class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 transform"
+      >
+        <div class="flex items-center mb-4">
+          <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
+            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 ml-3">팀원 프로필</h3>
+        </div>
+        <p class="text-gray-600 text-sm mb-4">
+          팀원들의 프로필과 조직도를 확인하고 연락처 정보를 찾아보세요.
+        </p>
+        <div class="flex items-center text-purple-600 text-sm font-medium">
+          더 보기 →
+        </div>
+      </router-link>
+
+      <!-- 팀 대시보드 카드 -->
+      <router-link 
+        to="/dashboard"
+        class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 transform"
+      >
+        <div class="flex items-center mb-4">
+          <div class="w-12 h-12 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg">
+            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 ml-3">팀 대시보드</h3>
+        </div>
+        <p class="text-gray-600 text-sm mb-4">
+          달력 기반 팀 전체 일정과 현황을 한눈에 확인할 수 있습니다.
+        </p>
+        <div class="flex items-center text-indigo-600 text-sm font-medium">
+          더 보기 →
+        </div>
+      </router-link>
+
+      <!-- MSP 관리 카드 -->
+      <router-link 
+        to="/msp"
+        class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 transform"
+      >
+        <div class="flex items-center mb-4">
+          <div class="w-12 h-12 bg-gradient-to-br from-teal-400 to-teal-600 rounded-lg flex items-center justify-center shadow-lg">
+            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m11 0a2 2 0 01-2 2H7a2 2 0 01-2-2m2-2h2m8 0h2" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 ml-3">MSP 관리</h3>
+        </div>
+        <p class="text-gray-600 text-sm mb-4">
+          보드 기반으로 팀원별 고객사 담당 현황을 관리하고 확인하세요.
+        </p>
+        <div class="flex items-center text-teal-600 text-sm font-medium">
+          더 보기 →
+        </div>
+      </router-link>
     </div>
 
     <!-- Quick Stats Section -->
