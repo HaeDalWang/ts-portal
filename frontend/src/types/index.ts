@@ -135,6 +135,58 @@ export interface Event extends BaseEntity {
   is_recurring: boolean
 }
 
+// 공지사항 관련 타입들
+export interface Notice extends BaseEntity {
+  title: string
+  content: string
+  priority: 'normal' | 'caution' | 'important'
+  author_id: number
+  author?: Member
+  is_pinned: boolean
+  is_active: boolean
+  views: number
+}
+
+export interface NoticeCreate {
+  title: string
+  content: string
+  priority?: 'normal' | 'caution' | 'important'
+  author_id: number
+  is_pinned?: boolean
+}
+
+export interface NoticeUpdate {
+  title?: string
+  content?: string
+  priority?: 'normal' | 'caution' | 'important'
+  is_pinned?: boolean
+  is_active?: boolean
+}
+
+export interface NoticeListResponse {
+  total: number
+  notices: Notice[]
+}
+
+export interface NoticeStats {
+  total_notices: number
+  pinned_notices: number
+  recent_notices: number
+  by_priority: {
+    normal: number
+    caution: number
+    important: number
+  }
+}
+
+export interface NoticeSearchParams {
+  q?: string
+  priority?: 'normal' | 'caution' | 'important'
+  author_id?: number
+  is_pinned?: boolean
+  active_only?: boolean
+}
+
 // API 응답 타입들
 export interface ApiError {
   detail: string

@@ -39,6 +39,7 @@ class Member(Base):
     # 관계 설정
     assignments = relationship("Assignment", back_populates="member", cascade="all, delete-orphan")
     created_events = relationship("Event", back_populates="creator")
+    notices = relationship("Notice", back_populates="author", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<Member(id={self.id}, name='{self.name}', email='{self.email}')>"

@@ -112,6 +112,8 @@
           </div>
         </div>
 
+
+
         <!-- 오늘 일정 - 컴팩트 -->
         <div class="flex-1 overflow-y-auto min-h-0">
           <div class="p-3">
@@ -220,7 +222,7 @@ const calendarOptions = ref({
   height: 'calc(100vh - 80px)', // 헤더가 작아진 만큼 더 큰 높이
   events: loadEvents,
   eventDidMount: (info: any) => {
-    // 툴팁 추가
+    // 툴크 추가
     info.el.title = `${info.event.title}\n${info.event.extendedProps.description || ''}`
   },
   // 달력 셀 크기 최적화
@@ -259,6 +261,8 @@ const formatTime = (timeString: string): string => {
     hour12: false 
   })
 }
+
+
 
 const changeCalendarView = (viewName: string) => {
   currentView.value = viewName

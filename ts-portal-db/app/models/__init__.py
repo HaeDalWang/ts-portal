@@ -6,5 +6,6 @@ from .member import Member
 from .customer import Customer
 from .assignment import Assignment
 from .event import Event
+from .notice import Notice
 
-__all__ = ["Member", "Customer", "Assignment", "Event"] 
+__all__ = ["Member", "Customer", "Assignment", "Event", "Notice"] 

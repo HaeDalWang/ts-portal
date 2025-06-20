@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from .database import get_db, init_db, get_db_info
-from .models import Member, Customer, Assignment, Event
+from .models import Member, Customer, Assignment, Event, Notice
 from .routers import members_router, customers_router
 
 # 로깅 설정
@@ -40,11 +40,12 @@ app.add_middleware(
 )
 
 # CRUD 라우터 등록
-from .routers import events as events_router
+from .routers import events as events_router, notices as notices_router
 
 app.include_router(members_router)
 app.include_router(customers_router)
 app.include_router(events_router.router)
+app.include_router(notices_router.router)
 
 
 @app.on_event("startup")
