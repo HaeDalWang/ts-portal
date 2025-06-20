@@ -57,3 +57,83 @@ terraform.tfstate.*
 
 # 로그 파일 무시
 logs/*
+
+# Python 관련
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# 가상환경
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# 데이터베이스 파일들 (중요!)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+ts-portal-db/data/*.db*
+ts-portal-db/data/*.sqlite*
+
+# 환경 변수 파일
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.staging
+
+# Redis 덤프 파일
+dump.rdb
+
+# 로그 파일들
+*.log
+logs/
+honeybox/logs/
+ts-portal-db/logs/
+
+# 임시 파일들
+*.tmp
+*.temp
+.cache/
+
+# IDE 설정 파일들
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+*.swp
+*.swo
+*~
+
+# 백업 파일들
+*.bak
+*.backup
+*.old
+
+# 민감한 설정 파일들
+config/secrets.json
+config/production.json
