@@ -33,7 +33,7 @@ const greeting = computed(() => {
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- 확장된 헤더 -->
-    <div class="bg-gradient-to-r from-purple-500 to-blue-600 px-6 py-6 text-white">
+    <div class="bg-gradient-to-r from-purple-500 to-blue-600 px-6 py-6 text-white rounded-b-xl">
       <div class="flex items-center justify-between">
         <div class="flex-1">
           <div class="mb-3">
@@ -110,7 +110,7 @@ const greeting = computed(() => {
 
         <!-- TS 공지사항 카드 -->
         <router-link 
-          to="/events"
+          to="/notices"
           class="bg-white rounded-xl shadow-lg border border-gray-200 p-4 hover:shadow-xl transition-shadow cursor-pointer"
         >
           <div class="flex items-center space-x-3 mb-3">

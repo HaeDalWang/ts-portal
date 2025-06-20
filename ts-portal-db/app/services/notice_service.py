@@ -257,7 +257,7 @@ class NoticeService:
             id=notice.id,
             title=notice.title,
             content=notice.content,
-            priority=notice.priority,
+            priority=notice.priority.value,
             author_id=notice.author_id,
             author=author_info,
             is_active=notice.is_active,

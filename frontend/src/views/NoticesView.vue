@@ -422,19 +422,19 @@ onMounted(() => {
               
               <div class="flex-1 min-w-0">
                 <div class="flex items-center space-x-2 mb-2">
-                  <h3 class="text-lg font-semibold text-gray-900 truncate">{{ notice.title }}</h3>
-                  <span v-if="notice.is_pinned" class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">
+                  <h3 class="text-sm font-semibold text-gray-900 truncate">{{ notice.title }}</h3>
+                  <span v-if="notice.is_pinned" class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full">
                     📌 고정
                   </span>
                 </div>
-                <div class="flex items-center space-x-3 text-sm text-gray-500 mb-3">
+                <div class="flex items-center space-x-3 text-xs text-gray-600 mb-3">
                   <span>{{ getAuthorName(notice.author_id) }}</span>
                   <span>•</span>
                   <span>{{ formatRelativeDate(notice.created_at) }}</span>
                   <span>•</span>
                   <span>조회 {{ notice.views }}회</span>
                 </div>
-                <p class="text-gray-600 leading-relaxed line-clamp-2">
+                <p class="text-xs text-gray-600 leading-relaxed line-clamp-2">
                   {{ notice.content.length > 120 ? notice.content.substring(0, 120) + '...' : notice.content }}
                 </p>
               </div>
@@ -442,7 +442,7 @@ onMounted(() => {
             
             <div class="flex items-center space-x-3 ml-4">
               <!-- 중요도 배지 -->
-              <span :class="['px-3 py-1 rounded-full text-sm font-medium', getPriorityColor(notice.priority)]">
+              <span :class="['px-3 py-1 rounded-full text-xs font-semibold', getPriorityColor(notice.priority)]">
                 {{ getPriorityLabel(notice.priority) }}
               </span>
               
@@ -506,21 +506,21 @@ onMounted(() => {
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', getPriorityColor(notice.priority)]">
+                  <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold', getPriorityColor(notice.priority)]">
                     {{ getPriorityIcon(notice.priority) }} {{ getPriorityLabel(notice.priority) }}
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {{ getAuthorName(notice.author_id) }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
                   {{ formatDate(notice.created_at) }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
                   {{ notice.views }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', notice.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                  <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold', notice.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
                     {{ notice.is_active ? '활성' : '비활성' }}
                   </span>
                 </td>
@@ -551,8 +551,8 @@ onMounted(() => {
       <!-- 빈 상태 -->
       <div v-if="!loading && !error && filteredNotices.length === 0" class="bg-white rounded-xl shadow-lg border border-gray-200 p-12 text-center">
         <div class="text-6xl mb-4">📭</div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">공지사항이 없습니다</h3>
-        <p class="text-gray-600 mb-4">
+        <h3 class="text-sm font-semibold text-gray-900 mb-2">공지사항이 없습니다</h3>
+        <p class="text-xs text-gray-600 mb-4">
           {{ searchQuery || selectedPriority !== 'all' || showPinnedOnly ? '검색 조건에 맞는 공지사항이 없습니다.' : '새로운 공지사항을 작성해보세요.' }}
         </p>
         <div class="space-x-3">
@@ -583,12 +583,12 @@ onMounted(() => {
                 {{ getPriorityIcon(selectedNotice.priority) }}
               </div>
               <div>
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ selectedNotice.title }}</h2>
+                <h2 class="text-xl font-bold text-gray-900 mb-2">{{ selectedNotice.title }}</h2>
                 <div class="flex items-center space-x-3">
-                  <span :class="['px-3 py-1 rounded-full text-sm font-medium', getPriorityColor(selectedNotice.priority)]">
+                  <span :class="['px-3 py-1 rounded-full text-xs font-semibold', getPriorityColor(selectedNotice.priority)]">
                     {{ getPriorityLabel(selectedNotice.priority) }}
                   </span>
-                  <span v-if="selectedNotice.is_pinned" class="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-full">
+                  <span v-if="selectedNotice.is_pinned" class="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full">
                     📌 고정 공지
                   </span>
                 </div>
@@ -604,7 +604,7 @@ onMounted(() => {
             </button>
           </div>
           
-          <div class="flex items-center space-x-4 text-sm text-gray-500 mb-6 pb-6 border-b border-gray-200">
+          <div class="flex items-center space-x-4 text-xs text-gray-600 mb-6 pb-6 border-b border-gray-200">
             <span class="font-medium">{{ getAuthorName(selectedNotice.author_id) }}</span>
             <span>•</span>
             <span>{{ formatDate(selectedNotice.created_at) }}</span>
@@ -613,7 +613,7 @@ onMounted(() => {
           </div>
           
           <div class="prose max-w-none">
-            <div class="whitespace-pre-wrap text-gray-700 leading-relaxed text-base">{{ selectedNotice.content }}</div>
+            <div class="whitespace-pre-wrap text-gray-700 leading-relaxed text-sm">{{ selectedNotice.content }}</div>
           </div>
           
           <div class="flex justify-end space-x-3 mt-8 pt-6 border-t border-gray-200">
@@ -658,7 +658,7 @@ onMounted(() => {
           
           <form @submit.prevent="createNotice" class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">제목</label>
+              <label class="block text-xs font-medium text-gray-700 mb-2">제목</label>
               <input
                 v-model="newNotice.title"
                 type="text"
@@ -669,7 +669,7 @@ onMounted(() => {
             </div>
             
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">내용</label>
+              <label class="block text-xs font-medium text-gray-700 mb-2">내용</label>
               <textarea
                 v-model="newNotice.content"
                 required
@@ -681,7 +681,7 @@ onMounted(() => {
             
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">중요도</label>
+                <label class="block text-xs font-medium text-gray-700 mb-2">중요도</label>
                 <select
                   v-model="newNotice.priority"
                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -699,7 +699,7 @@ onMounted(() => {
                     type="checkbox"
                     class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                   >
-                  <span class="ml-2 text-sm text-gray-700">📌 상단 고정</span>
+                  <span class="ml-2 text-xs text-gray-700">📌 상단 고정</span>
                 </label>
               </div>
             </div>
@@ -742,7 +742,7 @@ onMounted(() => {
           
           <form @submit.prevent="updateNotice" class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">제목</label>
+              <label class="block text-xs font-medium text-gray-700 mb-2">제목</label>
               <input
                 v-model="editNotice.title"
                 type="text"
@@ -753,7 +753,7 @@ onMounted(() => {
             </div>
             
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">내용</label>
+              <label class="block text-xs font-medium text-gray-700 mb-2">내용</label>
               <textarea
                 v-model="editNotice.content"
                 required
@@ -765,7 +765,7 @@ onMounted(() => {
             
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">중요도</label>
+                <label class="block text-xs font-medium text-gray-700 mb-2">중요도</label>
                 <select
                   v-model="editNotice.priority"
                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -783,7 +783,7 @@ onMounted(() => {
                     type="checkbox"
                     class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                   >
-                  <span class="ml-2 text-sm text-gray-700">📌 상단 고정</span>
+                  <span class="ml-2 text-xs text-gray-700">📌 상단 고정</span>
                 </label>
               </div>
             </div>

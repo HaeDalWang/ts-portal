@@ -54,7 +54,39 @@ async def get_events(
     
     total = len(events)  # 실제로는 count 쿼리 필요
     
-    return EventListResponse(total=total, events=events)
+    # Event 객체를 딕셔너리로 변환하여 직렬화 문제 해결
+    result_events = []
+    for event in events:
+        event_dict = {
+            "id": event.id,
+            "title": event.title,
+            "description": event.description,
+            "event_type": event.event_type,
+            "start_time": event.start_time.isoformat(),
+            "end_time": event.end_time.isoformat() if event.end_time else None,
+            "all_day": event.all_day,
+            "location": event.location,
+            "participants": event.participants,
+            "created_by": event.created_by,
+            "created_at": event.created_at.isoformat(),
+            "updated_at": event.updated_at.isoformat(),
+            "event_type_display": event.event_type_display,
+            "event_type_icon": event.event_type_icon,
+            "default_color": event.default_color,
+            "duration_minutes": event.duration_minutes,
+            "is_today": event.is_today,
+            "is_upcoming": event.is_upcoming,
+            "is_ongoing": event.is_ongoing,
+            "status": event.status,
+            "creator": {
+                "id": event.creator.id,
+                "name": event.creator.name,
+                "email": event.creator.email
+            } if event.creator else None
+        }
+        result_events.append(event_dict)
+    
+    return EventListResponse(total=total, events=result_events)
 
 
 @router.get("/calendar", response_model=List[CalendarEventResponse], summary="달력용 이벤트 조회")

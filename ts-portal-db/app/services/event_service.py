@@ -41,11 +41,40 @@ class EventService:
         if event_type:
             query = query.filter(Event.event_type == event_type)
         
-        if start_date:
-            query = query.filter(Event.start_time >= start_date)
-        
-        if end_date:
-            # end_date 다음날 00:00:00 전까지
+        # 날짜 필터링 개선 - 다일간 이벤트 처리
+        if start_date and end_date:
+            # 특정 날짜 범위 내에 겹치는 이벤트를 찾기
+            start_datetime = datetime.combine(start_date, datetime.min.time())
+            end_datetime = datetime.combine(end_date + timedelta(days=1), datetime.min.time())
+            
+            # 이벤트가 조회 범위와 겹치는 조건:
+            # 1. 이벤트 시작일이 조회 종료일 이전이고
+            # 2. 이벤트 종료일이 조회 시작일 이후인 경우
+            query = query.filter(
+                and_(
+                    Event.start_time < end_datetime,
+                    or_(
+                        Event.end_time.is_(None),  # end_time이 없는 경우 (단일 이벤트)
+                        Event.end_time >= start_datetime  # end_time이 있는 경우
+                    )
+                )
+            )
+        elif start_date:
+            # 시작일만 지정된 경우
+            start_datetime = datetime.combine(start_date, datetime.min.time())
+            end_datetime = datetime.combine(start_date + timedelta(days=1), datetime.min.time())
+            
+            query = query.filter(
+                and_(
+                    Event.start_time < end_datetime,
+                    or_(
+                        Event.end_time.is_(None),  # end_time이 없는 경우
+                        Event.end_time >= start_datetime  # end_time이 있는 경우
+                    )
+                )
+            )
+        elif end_date:
+            # 종료일만 지정된 경우
             end_datetime = datetime.combine(end_date + timedelta(days=1), datetime.min.time())
             query = query.filter(Event.start_time < end_datetime)
         

@@ -9,15 +9,15 @@ from enum import Enum
 
 class NoticePriorityEnum(str, Enum):
     """공지사항 중요도 열거형"""
-    NORMAL = "normal"
-    CAUTION = "caution"
-    IMPORTANT = "important"
+    normal = "normal"
+    caution = "caution"
+    important = "important"
 
 class NoticeBase(BaseModel):
     """공지사항 기본 스키마"""
     title: str = Field(..., min_length=1, max_length=200, description="제목")
     content: str = Field(..., min_length=1, description="내용")
-    priority: NoticePriorityEnum = Field(default=NoticePriorityEnum.NORMAL, description="중요도")
+    priority: NoticePriorityEnum = Field(default=NoticePriorityEnum.normal, description="중요도")
     is_pinned: bool = Field(default=False, description="상단 고정 여부")
 
 class NoticeCreate(NoticeBase):

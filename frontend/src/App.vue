@@ -21,8 +21,8 @@ const toggleSidebarCollapse = () => {
     >
       <!-- 사이드바 헤더 -->
       <div :class="['flex items-center h-16 border-b border-gray-200', isSidebarCollapsed ? 'justify-center px-2' : 'justify-between px-4']">
-        <div class="flex items-center">
-          <!-- CSS 로고 -->
+        <!-- TS 로고 (펼쳐진 상태에서만 표시) -->
+        <div v-if="!isSidebarCollapsed" class="flex items-center">
           <div 
             :class="[
               'flex items-center justify-center font-bold text-white rounded-lg shadow-md transition-all duration-300',
@@ -34,7 +34,7 @@ const toggleSidebarCollapse = () => {
           </div>
         </div>
 
-        <!-- 접기/펴기 버튼 -->
+        <!-- 접기/펴기 버튼 (펼쳐진 상태) -->
         <button
           v-if="!isSidebarCollapsed"
           @click="toggleSidebarCollapse"
@@ -54,7 +54,7 @@ const toggleSidebarCollapse = () => {
           </svg>
         </button>
         
-        <!-- 접힌 상태에서 클릭 가능한 전체 영역 -->
+        <!-- 펼치기 버튼 (접힌 상태) -->
         <button
           v-if="isSidebarCollapsed"
           @click="toggleSidebarCollapse"
@@ -72,15 +72,15 @@ const toggleSidebarCollapse = () => {
       </div>
 
       <!-- 사이드바 메뉴 -->
-      <nav :class="['mt-8', isSidebarCollapsed ? 'px-2' : 'px-4']">
-        <div class="space-y-2">
+      <nav :class="['mt-6', isSidebarCollapsed ? 'px-1' : 'px-4']">
+        <div :class="isSidebarCollapsed ? 'space-y-1' : 'space-y-2'">
           <!-- 홈 -->
           <div class="relative group">
             <router-link
               to="/"
               :class="[
                 'flex items-center text-sm font-medium rounded-lg transition-all duration-200',
-                isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3',
+                isSidebarCollapsed ? 'justify-center w-12 h-10 mx-auto' : 'px-4 py-3',
                 route.name === 'home' 
                   ? 'bg-blue-100 text-blue-700' 
                   : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
@@ -89,14 +89,7 @@ const toggleSidebarCollapse = () => {
               <svg class="w-5 h-5 flex-shrink-0" :class="isSidebarCollapsed ? '' : 'mr-3'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
-              <span 
-                :class="[
-                  'transition-all duration-300',
-                  isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'
-                ]"
-              >
-                홈
-              </span>
+              <span v-if="!isSidebarCollapsed" class="transition-all duration-300">홈</span>
             </router-link>
             <!-- 툴팁 -->
             <div 
@@ -113,7 +106,7 @@ const toggleSidebarCollapse = () => {
               to="/aws-tips"
               :class="[
                 'flex items-center text-sm font-medium rounded-lg transition-all duration-200',
-                isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3',
+                isSidebarCollapsed ? 'justify-center w-12 h-10 mx-auto' : 'px-4 py-3',
                 route.name === 'aws-tips' 
                   ? 'bg-orange-100 text-orange-700' 
                   : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
@@ -122,14 +115,7 @@ const toggleSidebarCollapse = () => {
               <svg class="w-5 h-5 flex-shrink-0" :class="isSidebarCollapsed ? '' : 'mr-3'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
               </svg>
-              <span 
-                :class="[
-                  'transition-all duration-300',
-                  isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'
-                ]"
-              >
-                오늘의 AWS 소식
-              </span>
+              <span v-if="!isSidebarCollapsed" class="transition-all duration-300">오늘의 AWS 소식</span>
             </router-link>
             <!-- 툴팁 -->
             <div 
@@ -146,7 +132,7 @@ const toggleSidebarCollapse = () => {
               to="/notices"
               :class="[
                 'flex items-center text-sm font-medium rounded-lg transition-all duration-200',
-                isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3',
+                isSidebarCollapsed ? 'justify-center w-12 h-10 mx-auto' : 'px-4 py-3',
                 route.name === 'notices' 
                   ? 'bg-blue-100 text-blue-700' 
                   : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
@@ -155,14 +141,7 @@ const toggleSidebarCollapse = () => {
               <svg class="w-5 h-5 flex-shrink-0" :class="isSidebarCollapsed ? '' : 'mr-3'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
               </svg>
-              <span 
-                :class="[
-                  'transition-all duration-300',
-                  isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'
-                ]"
-              >
-                TS 공지사항
-              </span>
+              <span v-if="!isSidebarCollapsed" class="transition-all duration-300">TS 공지사항</span>
             </router-link>
             <!-- 툴팁 -->
             <div 
@@ -179,7 +158,7 @@ const toggleSidebarCollapse = () => {
               to="/lunch"
               :class="[
                 'flex items-center text-sm font-medium rounded-lg transition-all duration-200',
-                isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3',
+                isSidebarCollapsed ? 'justify-center w-12 h-10 mx-auto' : 'px-4 py-3',
                 route.name === 'lunch' 
                   ? 'bg-green-100 text-green-700' 
                   : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
@@ -188,14 +167,7 @@ const toggleSidebarCollapse = () => {
               <svg class="w-5 h-5 flex-shrink-0" :class="isSidebarCollapsed ? '' : 'mr-3'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.832 18.477 19.246 18 17.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
-              <span 
-                :class="[
-                  'transition-all duration-300',
-                  isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'
-                ]"
-              >
-                오늘의 점심 추천
-              </span>
+              <span v-if="!isSidebarCollapsed" class="transition-all duration-300">오늘의 점심 추천</span>
             </router-link>
             <!-- 툴팁 -->
             <div 
@@ -207,7 +179,7 @@ const toggleSidebarCollapse = () => {
           </div>
 
           <!-- 구분선 -->
-          <div :class="['border-t border-gray-200 my-4', isSidebarCollapsed ? 'mx-2' : 'mx-0']"></div>
+          <div :class="['border-t border-gray-200', isSidebarCollapsed ? 'my-2 mx-3' : 'my-4 mx-0']"></div>
 
           <!-- 팀원 프로필 -->
           <div class="relative group">
@@ -215,7 +187,7 @@ const toggleSidebarCollapse = () => {
               to="/team"
               :class="[
                 'flex items-center text-sm font-medium rounded-lg transition-all duration-200',
-                isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3',
+                isSidebarCollapsed ? 'justify-center w-12 h-10 mx-auto' : 'px-4 py-3',
                 route.name === 'team' 
                   ? 'bg-purple-100 text-purple-700' 
                   : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
@@ -224,14 +196,7 @@ const toggleSidebarCollapse = () => {
               <svg class="w-5 h-5 flex-shrink-0" :class="isSidebarCollapsed ? '' : 'mr-3'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-              <span 
-                :class="[
-                  'transition-all duration-300',
-                  isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'
-                ]"
-              >
-                팀원 프로필
-              </span>
+              <span v-if="!isSidebarCollapsed" class="transition-all duration-300">팀원 프로필</span>
             </router-link>
             <!-- 툴팁 -->
             <div 
@@ -248,7 +213,7 @@ const toggleSidebarCollapse = () => {
               to="/dashboard"
               :class="[
                 'flex items-center text-sm font-medium rounded-lg transition-all duration-200',
-                isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3',
+                isSidebarCollapsed ? 'justify-center w-12 h-10 mx-auto' : 'px-4 py-3',
                 route.name === 'dashboard' 
                   ? 'bg-indigo-100 text-indigo-700' 
                   : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
@@ -257,14 +222,7 @@ const toggleSidebarCollapse = () => {
               <svg class="w-5 h-5 flex-shrink-0" :class="isSidebarCollapsed ? '' : 'mr-3'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <span 
-                :class="[
-                  'transition-all duration-300',
-                  isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'
-                ]"
-              >
-                팀 대시보드
-              </span>
+              <span v-if="!isSidebarCollapsed" class="transition-all duration-300">팀 대시보드</span>
             </router-link>
             <!-- 툴팁 -->
             <div 
@@ -281,7 +239,7 @@ const toggleSidebarCollapse = () => {
               to="/msp"
               :class="[
                 'flex items-center text-sm font-medium rounded-lg transition-all duration-200',
-                isSidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3',
+                isSidebarCollapsed ? 'justify-center w-12 h-10 mx-auto' : 'px-4 py-3',
                 route.name === 'msp' 
                   ? 'bg-teal-100 text-teal-700' 
                   : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
@@ -290,14 +248,7 @@ const toggleSidebarCollapse = () => {
               <svg class="w-5 h-5 flex-shrink-0" :class="isSidebarCollapsed ? '' : 'mr-3'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m11 0a2 2 0 01-2 2H7a2 2 0 01-2-2m2-2h2m8 0h2" />
               </svg>
-              <span 
-                :class="[
-                  'transition-all duration-300',
-                  isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'
-                ]"
-              >
-                MSP 관리
-              </span>
+              <span v-if="!isSidebarCollapsed" class="transition-all duration-300">MSP 관리</span>
             </router-link>
             <!-- 툴팁 -->
             <div 
@@ -314,7 +265,7 @@ const toggleSidebarCollapse = () => {
     <!-- 메인 컨텐츠 영역 -->
     <div class="flex-1 flex flex-col">
       <!-- 페이지 컨텐츠 -->
-      <main class="flex-1 p-8">
+      <main class="flex-1 p-4">
         <div class="max-w-7xl mx-auto">
           <RouterView />
         </div>
