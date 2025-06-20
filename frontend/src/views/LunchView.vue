@@ -369,246 +369,316 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="space-y-6">
-    <!-- 헤더 섹션 -->
-    <div class="flex items-center space-x-4 mb-6">
-      <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
-        <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-      </div>
-      <div>
-        <h1 class="text-3xl font-bold text-gray-900">🍽️ 오늘의 점심 추천</h1>
-        <p class="text-gray-600">위치 기반 맛집 추천 서비스</p>
-      </div>
-    </div>
-
-    <!-- 오류 메시지 -->
-    <div v-if="error && !locationPermissionDenied" class="bg-red-50 border border-red-200 rounded-xl p-4">
-      <div class="flex items-center">
-        <svg class="w-5 h-5 text-red-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <p class="text-red-700">{{ error }}</p>
-      </div>
-    </div>
-
-    <!-- 위치 권한 거부 시 안내 -->
-    <div v-if="locationPermissionDenied" class="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
-      <div class="text-center">
-        <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-8 h-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
+  <div class="min-h-screen bg-gray-50">
+    <!-- 컴팩트 헤더 -->
+    <div class="bg-white border-b border-gray-200 px-6 py-3">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-bold text-gray-900">점심 추천</h1>
+          <p class="text-sm text-gray-500">오늘의 맛집 추천과 팀원 추천 메뉴</p>
         </div>
         
-        <h3 class="text-xl font-bold text-yellow-900 mb-3">위치 권한이 필요합니다</h3>
-        <p class="text-yellow-800 mb-6 leading-relaxed">
-          맛집 추천을 위해 현재 위치 정보가 필요합니다.<br>
-          위치를 공유하시면 주변 맛집을 추천해드릴게요!
-        </p>
-        
-        <div class="space-y-3">
-          <button
-            @click="requestLocationPermission"
-            :disabled="isLoading"
-            class="w-full bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-          >
-            <span v-if="isLoading" class="flex items-center justify-center">
-              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              위치 확인 중...
-            </span>
-            <span v-else class="flex items-center justify-center">
-              <span class="text-xl mr-2">📍</span>
-              위치 공유하기
-            </span>
-          </button>
-          
-          <button
-            @click="showLocationGuide = !showLocationGuide"
-            class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors"
-          >
-            <span class="flex items-center justify-center">
-              <span class="text-sm mr-2">⚙️</span>
-              {{ showLocationGuide ? '설정 안내 접기' : '브라우저 설정 도움말' }}
-            </span>
-          </button>
+        <!-- 통계 정보 -->
+        <div class="flex items-center space-x-4">
+          <div class="text-center">
+            <div class="text-sm font-semibold text-green-600">{{ recommendedRestaurant ? '1' : '0' }}</div>
+            <div class="text-xs text-gray-500">추천 맛집</div>
+          </div>
+          <div class="text-center">
+            <div class="text-sm font-semibold text-blue-600">{{ currentLocation ? '허용' : '미허용' }}</div>
+            <div class="text-xs text-gray-500">위치 권한</div>
+          </div>
+          <div class="text-center">
+            <div class="text-sm font-semibold text-purple-600">{{ currentLocation?.city || '알 수 없음' }}</div>
+            <div class="text-xs text-gray-500">현재 위치</div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 브라우저 설정 안내 -->
-    <div v-if="showLocationGuide" class="bg-blue-50 border border-blue-200 rounded-xl p-4">
-      <h4 class="font-bold text-blue-900 mb-2 flex items-center">
-        <span class="text-lg mr-2">💡</span>
-        브라우저 설정 방법
-      </h4>
-      <p class="text-blue-800 text-sm mb-3">{{ getLocationGuideText() }}</p>
-      <div class="text-xs text-blue-600">
-        <p>• 설정 변경 후 페이지를 새로고침해주세요</p>
-        <p>• 여전히 문제가 있다면 브라우저를 재시작해보세요</p>
-      </div>
-    </div>
-
-    <!-- 시작 화면 -->
-    <div v-if="!recommendedRestaurant && !locationPermissionDenied" class="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 text-center">
-      <div class="mb-8">
-        <div class="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-          <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        </div>
-        <h3 class="text-2xl font-bold text-gray-900 mb-3">맛집 추천 서비스</h3>
-        <p class="text-gray-600 leading-relaxed">
-          현재 위치를 기반으로 주변의 맛집 카테고리를 추천합니다.<br>
-          카테고리를 선택하면 실제 맛집들을 네이버지도에서 확인할 수 있어요!
-        </p>
-      </div>
-      
-      <button
-        @click="requestLocationAndRecommend"
-        :disabled="isLoading"
-        class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-      >
-        <span v-if="isLoading" class="flex items-center">
-          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          위치 확인 중...
-        </span>
-        <span v-else class="flex items-center">
-          <span class="text-xl mr-2">🎯</span>
-          맛집 추천받기
-        </span>
-      </button>
-    </div>
-
-    <!-- 추천 결과 화면 -->
-    <div v-if="recommendedRestaurant" class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-      <!-- 추천 카드 -->
-      <div class="bg-gradient-to-r from-green-500 to-green-600 px-6 py-6">
-        <h3 class="text-xl font-bold text-white flex items-center">
-          <span class="text-2xl mr-2">🎯</span>
-          오늘의 추천 맛집
-        </h3>
-      </div>
-      
-      <div class="p-6">
-        <div class="mb-6">
-          <h4 class="text-2xl font-bold text-gray-900 mb-3">{{ recommendedRestaurant.name }}</h4>
-          <div class="flex items-center space-x-2 text-gray-600 mb-4">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <!-- 메인 컨텐츠 -->
+    <div class="p-6 space-y-6">
+      <!-- 위치 권한 요청 카드 -->
+      <div v-if="!hasLocationPermission && !locationPermissionDenied" class="bg-gradient-to-r from-green-500 to-blue-600 rounded-xl p-6 text-white">
+        <div class="flex items-center space-x-4">
+          <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <span class="text-sm">{{ recommendedRestaurant.address }}</span>
           </div>
-          
-          <!-- 현재 위치 정보 표시 -->
-          <div v-if="currentLocation?.address" class="bg-gray-50 rounded-lg p-3 mb-4">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-2">
-                <span class="text-xs font-medium text-gray-500">현재 위치</span>
-                <span class="text-sm text-gray-700">{{ currentLocation.address }}</span>
-              </div>
-              <button
-                @click="requestLocationPermission"
+          <div class="flex-1">
+            <h3 class="text-lg font-bold mb-2">위치 기반 맛집 추천을 위해 위치 권한이 필요합니다</h3>
+            <p class="text-green-100 text-sm mb-4">현재 위치를 기반으로 주변 맛집을 추천해드립니다.</p>
+            <button 
+              @click="requestLocationAndRecommend"
+              :disabled="isLoading"
+              class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+            >
+              {{ isLoading ? '위치 확인 중...' : '위치 허용하고 추천받기' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 위치 권한 거부 시 안내 -->
+      <div v-if="locationPermissionDenied" class="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+        <div class="flex items-start space-x-4">
+          <svg class="w-6 h-6 text-yellow-600 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+          <div class="flex-1">
+            <h3 class="text-sm font-semibold text-yellow-800 mb-2">위치 권한이 거부되었습니다</h3>
+            <p class="text-xs text-yellow-700 mb-4">
+              맞춤형 맛집 추천을 위해 위치 권한을 허용해주세요. 브라우저 설정에서 위치 권한을 허용하거나 새로고침 후 다시 시도해보세요.
+            </p>
+            <div class="flex space-x-3">
+              <button 
+                @click="requestLocationAndRecommend"
                 :disabled="isLoading"
-                class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded transition-colors"
+                class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded-lg text-xs"
               >
-                📍 위치 재설정
+                다시 시도
+              </button>
+              <button 
+                @click="showLocationGuide = true"
+                class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-2 rounded-lg text-xs"
+              >
+                설정 도움말
               </button>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="grid grid-cols-1 gap-4 mb-6">
-          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-            <span class="text-sm font-medium text-gray-600">분류</span>
-            <span class="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
-              {{ recommendedRestaurant.category }}
-            </span>
-          </div>
-          
-          <div v-if="recommendedRestaurant.rating" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-            <span class="text-sm font-medium text-gray-600">평점</span>
-            <div class="flex items-center">
-              <span class="text-yellow-400 text-lg">★</span>
-              <span class="text-sm font-semibold ml-1">{{ recommendedRestaurant.rating }}</span>
-            </div>
-          </div>
-          
-          <div v-if="recommendedRestaurant.distance" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-            <span class="text-sm font-medium text-gray-600">거리</span>
-            <span class="text-sm font-semibold">{{ recommendedRestaurant.distance }}m</span>
-          </div>
+      <!-- 위치 설정 도움말 -->
+      <div v-if="showLocationGuide" class="bg-blue-50 border border-blue-200 rounded-xl p-6">
+        <div class="flex items-start justify-between mb-4">
+          <h3 class="text-sm font-semibold text-blue-800">위치 권한 설정 방법</h3>
+          <button @click="showLocationGuide = false" class="text-blue-400 hover:text-blue-600">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
-
-        <div class="space-y-3">
-          <button
-            @click="getNewRecommendation"
-            :disabled="isLoading"
-            class="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium py-3 px-4 rounded-xl transition-colors"
-          >
-            <span class="flex items-center justify-center">
-              <span class="text-lg mr-2">🔄</span>
-              다른 곳 추천받기
-            </span>
-          </button>
-          
-          <button
-            @click="openInMap(recommendedRestaurant)"
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-xl transition-colors"
-          >
-            <span class="flex items-center justify-center">
-              <span class="text-lg mr-2">🗺️</span>
-              실제 맛집 찾아보기
-            </span>
-          </button>
+        <div class="space-y-3 text-xs text-blue-700">
+          <div>
+            <strong>Chrome:</strong> 주소창 왼쪽의 자물쇠/위치 아이콘 클릭 → '위치' 허용
+          </div>
+          <div>
+            <strong>Safari:</strong> Safari 메뉴 → 환경설정 → 웹사이트 → 위치 서비스 → 허용
+          </div>
+          <div>
+            <strong>Firefox:</strong> 주소창 왼쪽의 방패/자물쇠 아이콘 클릭 → 권한 → 위치 허용
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- 사용 안내 -->
-    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
-      <h4 class="font-bold text-blue-900 mb-3 flex items-center">
-        <span class="text-xl mr-2">💡</span>
-        서비스 이용 안내
-      </h4>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-blue-800 text-sm">
-        <div class="space-y-2">
-          <div class="flex items-center">
-            <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-            위치 권한을 허용하면 정확한 추천을 받을 수 있습니다
-          </div>
-          <div class="flex items-center">
-            <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-            실수로 위치 권한을 거부했다면 "위치 공유하기" 버튼을 눌러주세요
-          </div>
-          <div class="flex items-center">
-            <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-            현재 위치 기준 1km 반경 내 음식점을 추천합니다
+      <!-- 오류 메시지 -->
+      <div v-if="error" class="bg-red-50 border border-red-200 rounded-xl p-6">
+        <div class="flex items-center space-x-3">
+          <svg class="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <h3 class="text-sm font-semibold text-red-800">오류가 발생했습니다</h3>
+            <p class="text-xs text-red-700 mt-1">{{ error }}</p>
           </div>
         </div>
-        <div class="space-y-2">
-          <div class="flex items-center">
-            <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-            카테고리를 추천받고 네이버지도에서 실제 맛집을 확인하세요
+      </div>
+
+      <!-- 로딩 상태 -->
+      <div v-if="isLoading" class="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+        <div class="flex items-center justify-center space-x-3">
+          <svg class="animate-spin h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span class="text-xs text-gray-600">맛집을 찾는 중...</span>
+        </div>
+      </div>
+
+      <!-- 현재 위치 정보 -->
+      <div v-if="currentLocation && !isLoading" class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-4 flex items-center">
+          <svg class="w-4 h-4 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          현재 위치 정보
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="font-medium text-gray-700">주소:</span>
+              <span class="text-gray-600">{{ currentLocation.address || '주소 정보 없음' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-medium text-gray-700">도시:</span>
+              <span class="text-gray-600">{{ currentLocation.city || '알 수 없음' }}</span>
+            </div>
           </div>
-          <div class="flex items-center">
-            <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-            현재 위치 기준으로 해당 카테고리의 음식점들을 검색합니다
+          <div class="space-y-2">
+            <div class="flex justify-between">
+              <span class="font-medium text-gray-700">구역:</span>
+              <span class="text-gray-600">{{ currentLocation.district || '알 수 없음' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-medium text-gray-700">국가:</span>
+              <span class="text-gray-600">{{ currentLocation.country || '알 수 없음' }}</span>
+            </div>
           </div>
-          <div class="flex items-center">
-            <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-            마음에 들지 않으면 다른 카테고리를 추천받을 수 있습니다
+        </div>
+      </div>
+
+      <!-- 추천 맛집 -->
+      <div v-if="recommendedRestaurant && !isLoading" class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <!-- 카드 헤더 -->
+        <div class="bg-gradient-to-r from-green-50 to-green-100 px-6 py-4 border-b border-green-200">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.832 18.477 19.246 18 17.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-sm font-semibold text-gray-900">오늘의 추천 맛집</h3>
+                <p class="text-xs text-gray-600">현재 위치 기반 추천</p>
+              </div>
+            </div>
+            
+            <!-- 카테고리 배지 -->
+            <div class="px-2 py-1 bg-green-100 text-green-600 rounded-full text-xs font-semibold">
+              {{ recommendedRestaurant.category }}
+            </div>
+          </div>
+        </div>
+
+        <!-- 카드 본문 -->
+        <div class="p-6">
+          <h2 class="text-sm font-semibold text-gray-900 mb-3">
+            {{ recommendedRestaurant.name }}
+          </h2>
+          
+          <div class="space-y-2 mb-4">
+            <div class="flex items-center text-xs text-gray-600">
+              <svg class="w-3 h-3 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              {{ recommendedRestaurant.address }}
+            </div>
+            
+            <div v-if="recommendedRestaurant.distance" class="flex items-center text-xs text-gray-600">
+              <svg class="w-3 h-3 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              도보 약 {{ recommendedRestaurant.distance }}m
+            </div>
+            
+            <div v-if="recommendedRestaurant.rating" class="flex items-center text-xs text-gray-600">
+              <svg class="w-3 h-3 mr-2 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+              평점 {{ recommendedRestaurant.rating }}/5.0
+            </div>
+          </div>
+
+          <!-- 액션 버튼 -->
+          <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+            <button
+              @click="requestLocationAndRecommend"
+              :disabled="isLoading"
+              class="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors text-xs"
+            >
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>다른 맛집 추천</span>
+            </button>
+            
+            <div class="text-xs text-gray-500">
+              AI 추천 알고리즘 기반
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 팀원 추천 메뉴 섹션 -->
+      <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-4 flex items-center">
+          <svg class="w-4 h-4 text-purple-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          팀원 추천 메뉴
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div class="bg-purple-50 border border-purple-200 rounded-lg p-3">
+            <div class="flex items-center space-x-2 mb-2">
+              <div class="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                <span class="text-white text-xs font-bold">김</span>
+              </div>
+              <span class="text-xs font-medium text-gray-700">김철수</span>
+            </div>
+            <p class="text-xs text-gray-600">"오늘은 김치찌개가 생각나네요! 🍲"</p>
+          </div>
+          
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <div class="flex items-center space-x-2 mb-2">
+              <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                <span class="text-white text-xs font-bold">박</span>
+              </div>
+              <span class="text-xs font-medium text-gray-700">박영희</span>
+            </div>
+            <p class="text-xs text-gray-600">"파스타 한 그릇 어떠세요? 🍝"</p>
+          </div>
+          
+          <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+            <div class="flex items-center space-x-2 mb-2">
+              <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                <span class="text-white text-xs font-bold">이</span>
+              </div>
+              <span class="text-xs font-medium text-gray-700">이민수</span>
+            </div>
+            <p class="text-xs text-gray-600">"치킨 한 마리 시킬까요? 🍗"</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 기능 안내 -->
+      <div class="bg-gray-50 rounded-xl p-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-4">💡 점심 추천 서비스 안내</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-gray-600">
+          <div class="space-y-2">
+            <div class="flex items-start space-x-2">
+              <svg class="w-3 h-3 text-green-500 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>현재 위치 기반 맛집 추천</span>
+            </div>
+            <div class="flex items-start space-x-2">
+              <svg class="w-3 h-3 text-green-500 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>팀원들의 실시간 메뉴 추천</span>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div class="flex items-start space-x-2">
+              <svg class="w-3 h-3 text-green-500 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>거리 및 평점 정보 제공</span>
+            </div>
+            <div class="flex items-start space-x-2">
+              <svg class="w-3 h-3 text-green-500 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>AI 기반 개인 맞춤 추천</span>
+            </div>
           </div>
         </div>
       </div>

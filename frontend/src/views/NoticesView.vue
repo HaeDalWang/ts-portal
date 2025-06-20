@@ -115,110 +115,115 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="space-y-6">
-    <!-- 헤더 섹션 -->
-    <div class="flex items-center justify-between mb-6">
-      <div class="flex items-center space-x-4">
-        <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
-          <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-          </svg>
-        </div>
+  <div class="min-h-screen bg-gray-50">
+    <!-- 컴팩트 헤더 -->
+    <div class="bg-white border-b border-gray-200 px-6 py-3">
+      <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold text-gray-900">TS 공지사항</h1>
-          <p class="text-gray-600">팀장님의 중요 공지사항과 주의사항을 확인하세요</p>
+          <h1 class="text-xl font-bold text-gray-900">TS 공지사항</h1>
+          <p class="text-sm text-gray-500">팀장님의 중요 공지사항과 주의사항</p>
         </div>
-      </div>
-      <div class="text-right">
-        <div class="text-sm text-gray-500">
-          총 {{ notices.length }}개의 공지사항
-        </div>
-        <div class="text-xs text-gray-400 mt-1">
-          미확인: {{ notices.filter(n => !n.isRead).length }}개
+        
+        <!-- 통계 정보 -->
+        <div class="flex items-center space-x-4">
+          <div class="text-center">
+            <div class="text-sm font-semibold text-blue-600">{{ notices.length }}</div>
+            <div class="text-xs text-gray-500">전체 공지</div>
+          </div>
+          <div class="text-center">
+            <div class="text-sm font-semibold text-red-600">{{ notices.filter(n => !n.isRead).length }}</div>
+            <div class="text-xs text-gray-500">미확인</div>
+          </div>
+          <div class="text-center">
+            <div class="text-sm font-semibold text-orange-600">{{ notices.filter(n => n.type === 'important').length }}</div>
+            <div class="text-xs text-gray-500">중요 공지</div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 로딩 상태 -->
-    <div v-if="isLoading" class="flex items-center justify-center py-12">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      <span class="ml-2 text-gray-600">공지사항을 불러오는 중...</span>
-    </div>
+    <!-- 메인 컨텐츠 -->
+    <div class="p-6 space-y-4">
+      <!-- 로딩 상태 -->
+      <div v-if="isLoading" class="flex items-center justify-center py-12">
+        <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+        <span class="ml-2 text-xs text-gray-600">공지사항을 불러오는 중...</span>
+      </div>
 
-    <!-- 공지사항 목록 -->
-    <div v-else class="space-y-4">
-      <div 
-        v-for="notice in notices" 
-        :key="notice.id"
-        :class="[
-          'bg-white rounded-xl shadow-lg border-2 p-6 transition-all duration-300 cursor-pointer hover:shadow-xl',
-          getNoticeStyle(notice.type).borderColor,
-          !notice.isRead ? 'ring-2 ring-offset-2 ring-blue-200' : ''
-        ]"
-        @click="markAsRead(notice.id)"
-      >
-        <div class="flex items-start justify-between mb-4">
-          <div class="flex items-center space-x-3">
-            <!-- 공지사항 타입 아이콘 -->
-            <div :class="['w-10 h-10 rounded-lg flex items-center justify-center', getNoticeStyle(notice.type).bgColor]">
-              <svg v-if="notice.type === 'important'" :class="['w-5 h-5', getNoticeStyle(notice.type).iconColor]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
-              <svg v-else-if="notice.type === 'warning'" :class="['w-5 h-5', getNoticeStyle(notice.type).iconColor]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <svg v-else :class="['w-5 h-5', getNoticeStyle(notice.type).iconColor]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+      <!-- 공지사항 목록 -->
+      <div v-else class="space-y-3">
+        <div 
+          v-for="notice in notices" 
+          :key="notice.id"
+          :class="[
+            'bg-white rounded-xl shadow-lg border-2 p-4 transition-all cursor-pointer hover:shadow-xl',
+            getNoticeStyle(notice.type).borderColor,
+            !notice.isRead ? 'ring-2 ring-offset-2 ring-blue-200' : ''
+          ]"
+          @click="markAsRead(notice.id)"
+        >
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex items-center space-x-3">
+              <!-- 공지사항 타입 아이콘 -->
+              <div :class="['w-8 h-8 rounded-lg flex items-center justify-center', getNoticeStyle(notice.type).bgColor]">
+                <svg v-if="notice.type === 'important'" :class="['w-4 h-4', getNoticeStyle(notice.type).iconColor]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <svg v-else-if="notice.type === 'warning'" :class="['w-4 h-4', getNoticeStyle(notice.type).iconColor]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <svg v-else :class="['w-4 h-4', getNoticeStyle(notice.type).iconColor]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              
+              <div>
+                <h3 class="text-sm font-semibold text-gray-900 mb-1">{{ notice.title }}</h3>
+                <div class="flex items-center space-x-2 text-xs text-gray-500">
+                  <span>{{ notice.author }}</span>
+                  <span>•</span>
+                  <span>{{ notice.createdAt }}</span>
+                </div>
+              </div>
             </div>
             
-            <div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ notice.title }}</h3>
-              <div class="flex items-center space-x-3 text-sm text-gray-500">
-                <span>{{ notice.author }}</span>
-                <span>•</span>
-                <span>{{ notice.createdAt }}</span>
-              </div>
+            <div class="flex items-center space-x-2">
+              <!-- 공지사항 타입 배지 -->
+              <span :class="['px-2 py-1 rounded-full text-xs font-semibold', getNoticeStyle(notice.type).badgeColor]">
+                {{ getTypeLabel(notice.type) }}
+              </span>
+              
+              <!-- 읽음 상태 표시 -->
+              <div v-if="!notice.isRead" class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
             </div>
           </div>
           
-          <div class="flex items-center space-x-2">
-            <!-- 공지사항 타입 배지 -->
-            <span :class="['px-2 py-1 rounded-full text-xs font-medium', getNoticeStyle(notice.type).badgeColor]">
-              {{ getTypeLabel(notice.type) }}
-            </span>
-            
-            <!-- 읽음 상태 표시 -->
-            <div v-if="!notice.isRead" class="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+          <!-- 공지 내용 -->
+          <div class="text-xs text-gray-600 leading-relaxed pl-11">
+            {{ notice.content }}
           </div>
-        </div>
-        
-        <!-- 공지 내용 -->
-        <div class="text-gray-700 leading-relaxed">
-          {{ notice.content }}
-        </div>
-        
-        <!-- 하단 액션 영역 -->
-        <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-          <div class="text-xs text-gray-400">
-            {{ notice.isRead ? '읽음' : '미확인' }}
-          </div>
-          <div class="text-blue-600 text-sm font-medium hover:text-blue-700 transition-colors">
-            {{ notice.isRead ? '다시 보기' : '확인하기' }} →
+          
+          <!-- 읽음 처리 안내 -->
+          <div v-if="!notice.isRead" class="mt-3 pt-3 border-t border-gray-100">
+            <div class="flex items-center text-xs text-blue-600">
+              <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              클릭하여 읽음 처리
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    
-    <!-- 공지사항이 없는 경우 -->
-    <div v-if="!isLoading && notices.length === 0" class="text-center py-12">
-      <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg class="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-4h-2m-3 0h-2m-3 0h-2m-3 0H6" />
+
+      <!-- 빈 상태 -->
+      <div v-if="!isLoading && notices.length === 0" class="text-center py-12">
+        <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-8V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v1M7 8h10l-1 8H8L7 8z" />
         </svg>
+        <h3 class="text-sm font-semibold text-gray-900 mb-2">공지사항이 없습니다</h3>
+        <p class="text-xs text-gray-600">새로운 공지사항이 등록되면 여기에 표시됩니다.</p>
       </div>
-      <h3 class="text-lg font-medium text-gray-900 mb-2">공지사항이 없습니다</h3>
-      <p class="text-gray-500">새로운 공지사항이 등록되면 알려드릴게요.</p>
     </div>
   </div>
 </template>
