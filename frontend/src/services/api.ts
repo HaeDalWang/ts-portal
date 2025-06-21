@@ -4,8 +4,24 @@
 
 import axios from 'axios'
 
+// 환경변수에서 API URL 가져오기
+const getApiBaseUrl = (): string => {
+  // 개발 환경에서는 localhost, 프로덕션에서는 실제 도메인 사용
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL
+  }
+  
+  // 환경변수가 없을 경우 기본값 설정
+  return import.meta.env.DEV 
+    ? 'http://localhost:8001' 
+    : 'https://tsapi.seungdobae.com/api/db'
+}
+
 // API 기본 설정
-const API_BASE_URL = 'http://localhost:8001'
+const API_BASE_URL = getApiBaseUrl()
+
+console.log(`[API Config] Base URL: ${API_BASE_URL}`)
+console.log(`[API Config] Environment: ${import.meta.env.VITE_APP_ENV || (import.meta.env.DEV ? 'development' : 'production')}`)
 
 // axios 인스턴스 생성
 const apiClient = axios.create({
@@ -88,6 +104,22 @@ export const api = {
   // DELETE 요청
   delete: (url: string): Promise<void> => 
     apiClient.delete(url).then(() => undefined),
+}
+
+// HoneyBox API용 별도 클라이언트 (AWS 뉴스 피드)
+export const createHoneyBoxClient = () => {
+  const honeyboxUrl = import.meta.env.VITE_HONEYBOX_API_URL || 
+    (import.meta.env.DEV ? 'http://localhost:8000' : 'https://tsapi.seungdobae.com/api/feeds')
+  
+  console.log(`[HoneyBox API] URL: ${honeyboxUrl}`)
+  
+  return axios.create({
+    baseURL: honeyboxUrl,
+    timeout: 10000,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
 }
 
 export default apiClient 

@@ -124,6 +124,86 @@ npm run dev
 npm run type-check
 ```
 
+## 🚀 환경별 빌드 및 배포
+
+### 개발 환경
+```bash
+# 개발 서버 실행 (localhost API 사용)
+npm run dev
+
+# 개발 환경용 빌드
+npm run build:dev
+```
+
+### 프로덕션 환경
+```bash
+# 프로덕션 빌드 (tsapi.seungdobae.com API 사용)
+npm run build:prod
+
+# 또는 기본 빌드 명령어 (프로덕션 모드)
+npm run build
+```
+
+## 🔧 환경변수 설정
+
+### 개발 환경 (.env.development)
+```env
+VITE_APP_ENV=development
+VITE_API_BASE_URL=http://localhost:8001
+VITE_HONEYBOX_API_URL=http://localhost:8000
+VITE_DB_API_URL=http://localhost:8001
+```
+
+### 프로덕션 환경 (.env.production)
+```env
+VITE_APP_ENV=production
+VITE_API_BASE_URL=https://tsapi.seungdobae.com/api/db
+VITE_HONEYBOX_API_URL=https://tsapi.seungdobae.com/api/feeds
+VITE_DB_API_URL=https://tsapi.seungdobae.com/api/db
+```
+
+## 📡 API 엔드포인트
+
+### 개발 환경
+- **TS Portal DB API**: http://localhost:8001
+- **HoneyBox API**: http://localhost:8000
+
+### 프로덕션 환경
+- **TS Portal DB API**: https://tsapi.seungdobae.com/api/db
+- **HoneyBox API**: https://tsapi.seungdobae.com/api/feeds
+
+## 🔄 자동 환경 감지
+
+애플리케이션은 다음 순서로 API URL을 결정합니다:
+
+1. **환경변수 우선**: `VITE_API_BASE_URL`, `VITE_HONEYBOX_API_URL` 등
+2. **자동 감지**: Vite의 `import.meta.env.DEV` 플래그 기반
+   - 개발 모드: localhost URL 사용
+   - 프로덕션 모드: tsapi.seungdobae.com URL 사용
+
+## 📦 S3 + CloudFront 배포
+
+### 1. 프로덕션 빌드
+```bash
+npm run build:prod
+```
+
+### 2. S3 업로드
+```bash
+# AWS CLI를 사용한 배포 (예시)
+aws s3 sync dist/ s3://your-bucket-name --delete
+```
+
+### 3. CloudFront 캐시 무효화
+```bash
+# CloudFront 배포 ID로 캐시 무효화
+aws cloudfront create-invalidation --distribution-id YOUR_DISTRIBUTION_ID --paths "/*"
+```
+
+---
+
+**이제 개발 시에는 localhost로, 프로덕션에서는 tsapi.seungdobae.com으로 자동 연결됩니다!** 🎯
+
 ## 📁 프로젝트 구조
 
 ```
