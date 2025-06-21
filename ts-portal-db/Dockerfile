@@ -25,7 +25,7 @@ COPY init_sample_data.py .
 RUN mkdir -p /app/data
 
 # 비루트 사용자 생성 및 권한 설정
-RUN groupadd -r tsportal && useradd -r -g tsportal tsportal && \
+RUN groupadd -r -g 1000 tsportal && useradd -r -u 1000 -g tsportal tsportal && \
     chown -R tsportal:tsportal /app
 
 # 비루트 사용자로 전환
