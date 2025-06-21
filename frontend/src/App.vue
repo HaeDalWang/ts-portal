@@ -16,7 +16,7 @@ const toggleSidebarCollapse = () => {
     <div
       :class="[
         'bg-white shadow-lg transition-all duration-300 ease-in-out',
-        isSidebarCollapsed ? 'w-16' : 'w-64'
+        isSidebarCollapsed ? 'w-16' : 'w-52'
       ]"
     >
       <!-- 사이드바 헤더 -->

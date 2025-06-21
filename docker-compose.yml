@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: ts-portal-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Nginx 설정 파일
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      # SSL 인증서 (Let's Encrypt)
+      - ./ssl:/etc/letsencrypt:ro
+      # Nginx 로그
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - honeybox
+      - ts-portal-db
+    restart: unless-stopped
+    networks:
+      - ts-portal-network
+
+  honeybox:
+    build: 
+      context: ./honeybox
+      dockerfile: Dockerfile
+    container_name: ts-portal-honeybox
+    expose:
+      - "8000"
+    volumes:
+      # Redis 데이터 (향후 Redis 컨테이너 추가 시)
+      - ./data/redis:/data
+      # 애플리케이션 로그
+      - ./logs/honeybox:/app/logs
+    environment:
+      - PYTHONPATH=/app
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    restart: unless-stopped
+    networks:
+      - ts-portal-network
+
+  ts-portal-db:
+    build:
+      context: ./ts-portal-db
+      dockerfile: Dockerfile
+    container_name: ts-portal-db
+    expose:
+      - "8001"
+    volumes:
+      # SQLite 데이터베이스 영구 저장
+      - ./data/sqlite:/app/data
+      # 애플리케이션 로그
+      - ./logs/ts-portal-db:/app/logs
+    environment:
+      - PYTHONPATH=/app
+      - DATABASE_URL=sqlite:///./data/ts_portal.db
+    restart: unless-stopped
+    networks:
+      - ts-portal-network
+
+  # Redis (HoneyBox 캐싱용)
+  redis:
+    image: redis:7-alpine
+    container_name: ts-portal-redis
+    expose:
+      - "6379"
+    volumes:
+      # Redis 데이터 영구 저장
+      - ./data/redis:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    networks:
+      - ts-portal-network
+
+networks:
+  ts-portal-network:
+    driver: bridge
+    name: ts-portal-network
+
+volumes:
+  # 명시적 볼륨 정의 (선택적)
+  ts-portal-data:
+    driver: local 
