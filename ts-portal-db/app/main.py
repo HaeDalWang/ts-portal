@@ -30,22 +30,28 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# CORS 설정
+# CORS 설정 - 더 구체적으로 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 개발 환경에서는 모든 오리진 허용
+    allow_origins=[
+        "http://localhost:5173",  # Vite 개발 서버
+        "http://localhost:3000",  # 추가 개발 포트
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000"
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
-# CRUD 라우터 등록
-from .routers import events as events_router, notices as notices_router
+# 라우터 등록 - 인증 라우터를 먼저 등록
+from .routers import events as events_router, notices as notices_router, auth as auth_router
 
-app.include_router(members_router)
-app.include_router(customers_router)
-app.include_router(events_router.router)
-app.include_router(notices_router.router)
+app.include_router(auth_router.router, prefix="/api")  # API 접두사 추가
+app.include_router(members_router, prefix="/api")
+app.include_router(customers_router, prefix="/api")
+app.include_router(events_router.router, prefix="/api")
+app.include_router(notices_router.router, prefix="/api")
 
 
 @app.on_event("startup")

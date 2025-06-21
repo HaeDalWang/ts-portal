@@ -54,6 +54,13 @@ services:
     environment:
       - PYTHONPATH=/app
       - DATABASE_URL=sqlite:///./data/ts_portal.db
+      # JWT 설정
+      - JWT_SECRET_KEY=your-super-secret-jwt-key-change-in-production
+      - JWT_EXPIRE_MINUTES=1440
+      # 기본 관리자 계정 설정
+      - ADMIN_EMAIL=admin@saltware.co.kr
+      - ADMIN_PASSWORD=admin123!
+      - ADMIN_NAME=관리자
     restart: unless-stopped
     networks:
       - ts-portal-network

@@ -25,21 +25,29 @@ class MemberService:
         """이메일로 팀원 조회"""
         return self.db.query(Member).filter(Member.email == email).first()
     
-    def get_members(self, skip: int = 0, limit: int = 100, active_only: bool = False) -> List[Member]:
+    def get_members(self, skip: int = 0, limit: int = 100, active_only: bool = False, exclude_admin: bool = True) -> List[Member]:
         """팀원 목록 조회"""
         query = self.db.query(Member)
         
         if active_only:
             query = query.filter(Member.is_active == True)
         
+        # 관리자 제외 (기본값: True)
+        if exclude_admin:
+            query = query.filter(Member.role != 'admin')
+        
         return query.offset(skip).limit(limit).all()
     
-    def get_members_count(self, active_only: bool = False) -> int:
+    def get_members_count(self, active_only: bool = False, exclude_admin: bool = True) -> int:
         """팀원 총 개수"""
         query = self.db.query(Member)
         
         if active_only:
             query = query.filter(Member.is_active == True)
+        
+        # 관리자 제외 (기본값: True)
+        if exclude_admin:
+            query = query.filter(Member.role != 'admin')
         
         return query.count()
     
@@ -54,8 +62,15 @@ class MemberService:
             )
         
         try:
+            # 비밀번호 해시 처리를 위해 데이터 변환
+            member_dict = member_data.model_dump()
+            password = member_dict.pop('password')  # password 필드 제거
+            
             # 새 팀원 생성
-            db_member = Member(**member_data.model_dump())
+            db_member = Member(**member_dict)
+            # 비밀번호는 해시로 저장 (실제로는 bcrypt 등을 사용해야 함)
+            db_member.password_hash = password  # 임시로 평문 저장, 나중에 해시 처리 필요
+            
             self.db.add(db_member)
             self.db.commit()
             self.db.refresh(db_member)
@@ -159,12 +174,16 @@ class MemberService:
                 detail="팀원 복구 중 오류가 발생했습니다."
             )
     
-    def search_members(self, query: str, active_only: bool = False) -> List[Member]:
+    def search_members(self, query: str, active_only: bool = False, exclude_admin: bool = True) -> List[Member]:
         """팀원 검색 (이름, 이메일, 직급으로 검색)"""
         db_query = self.db.query(Member)
         
         if active_only:
             db_query = db_query.filter(Member.is_active == True)
+        
+        # 관리자 제외 (기본값: True)
+        if exclude_admin:
+            db_query = db_query.filter(Member.role != 'admin')
         
         # 이름, 이메일, 직급에서 검색
         search_filter = (

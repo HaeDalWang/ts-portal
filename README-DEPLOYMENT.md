@@ -92,7 +92,23 @@ vi docker-compose.yml
 vi nginx/nginx.conf
 ```
 
-### 6. 서비스 시작
+### 6. 인증 시스템 초기화
+
+```bash
+# ts-portal-db 컨테이너에서 인증 시스템 초기화
+docker-compose exec ts-portal-db python init_auth_system.py
+
+# 또는 서비스 시작 전에 로컬에서 실행
+cd ts-portal-db
+python init_auth_system.py
+```
+
+**기본 관리자 계정:**
+- 이메일: `admin@seungdobae.com`
+- 비밀번호: `admin123!`
+- ⚠️ **로그인 후 반드시 비밀번호를 변경하세요!**
+
+### 7. 서비스 시작
 
 ```bash
 # Docker 이미지 빌드 및 서비스 시작

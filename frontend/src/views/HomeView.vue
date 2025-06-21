@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
+import { api } from '@/services/api'
+import authService from '@/services/authService'
 
 // 현재 날짜와 시간 정보
 const today = computed(() => {
@@ -27,6 +29,59 @@ const greeting = computed(() => {
   if (hour < 12) return '좋은 아침입니다! ☀️'
   if (hour < 18) return '좋은 오후입니다! 🌤️'
   return '좋은 저녁입니다! 🌙'
+})
+
+// 사용자 정보
+const currentUser = computed(() => authService.getUser())
+
+const userName = computed(() => {
+  return currentUser.value?.name || '사용자'
+})
+
+const userInitials = computed(() => {
+  if (!currentUser.value?.name) return 'U'
+  return currentUser.value.name
+    .split(' ')
+    .map(word => word.charAt(0))
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
+})
+
+// 통계 데이터
+const stats = ref({
+  members: 0,  // API에서 가져올 값
+  customers: 0 // API에서 가져올 값
+})
+
+const isLoading = ref(true)
+
+// 통계 데이터 로드
+const loadStats = async () => {
+  try {
+    isLoading.value = true
+    
+    // 팀원 수 조회
+    const membersResponse = await api.get('/members/')
+    stats.value.members = Array.isArray(membersResponse) ? membersResponse.length : 0
+    
+    // 고객사 수 조회
+    const customersResponse = await api.get('/customers/')
+    stats.value.customers = Array.isArray(customersResponse) ? customersResponse.length : 0
+    
+  } catch (error) {
+    console.error('통계 데이터 로드 실패:', error)
+    // 에러 시 기본값 유지
+    stats.value.members = 0
+    stats.value.customers = 0
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// 컴포넌트 마운트 시 데이터 로드
+onMounted(() => {
+  loadStats()
 })
 </script>
 
@@ -58,19 +113,33 @@ const greeting = computed(() => {
         </div>
         
         <!-- 통계 정보 -->
-        <div class="flex items-center space-x-6">
+        <div class="flex items-center space-x-8">
           <div class="text-center">
-            <div class="text-lg font-bold text-white">6</div>
-            <div class="text-xs text-purple-100">서비스</div>
-          </div>
-          <div class="text-center">
-            <div class="text-lg font-bold text-white">14</div>
+            <div class="text-lg font-bold text-white">
+              {{ isLoading ? '...' : stats.members }}
+            </div>
             <div class="text-xs text-purple-100">팀원</div>
           </div>
           <div class="text-center">
-            <div class="text-lg font-bold text-white">6</div>
+            <div class="text-lg font-bold text-white">
+              {{ isLoading ? '...' : stats.customers }}
+            </div>
             <div class="text-xs text-purple-100">고객사</div>
           </div>
+          
+          <!-- 프로필 버튼 -->
+          <router-link 
+            to="/profile"
+            class="flex items-center space-x-2 bg-white/10 hover:bg-white/20 rounded-lg px-3 py-2 transition-colors"
+          >
+            <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white text-sm font-bold">
+              {{ userInitials }}
+            </div>
+            <div class="text-left">
+              <div class="text-xs font-medium text-white">{{ userName }}</div>
+              <div class="text-xs text-purple-100">프로필</div>
+            </div>
+          </router-link>
         </div>
       </div>
     </div>

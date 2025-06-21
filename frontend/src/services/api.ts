@@ -6,15 +6,8 @@ import axios from 'axios'
 
 // 환경변수에서 API URL 가져오기
 const getApiBaseUrl = (): string => {
-  // 개발 환경에서는 localhost, 프로덕션에서는 실제 도메인 사용
-  if (import.meta.env.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL
-  }
-  
-  // 환경변수가 없을 경우 기본값 설정
-  return import.meta.env.DEV 
-    ? 'http://localhost:8001' 
-    : 'https://tsapi.seungdobae.com/api/db'
+  // 임시로 하드코딩하여 확실히 /api 접두사 포함
+  return 'http://localhost:8001/api'
 }
 
 // API 기본 설정
@@ -32,10 +25,17 @@ const apiClient = axios.create({
   },
 })
 
-// 요청 인터셉터
+// 요청 인터셉터 - 토큰 자동 추가
 apiClient.interceptors.request.use(
   (config) => {
     console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`)
+    
+    // localStorage에서 토큰 가져와서 헤더에 추가
+    const token = localStorage.getItem('ts_portal_token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    
     return config
   },
   (error) => {

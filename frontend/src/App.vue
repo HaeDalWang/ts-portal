@@ -1,12 +1,37 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import authService from '@/services/authService'
 
 const route = useRoute()
+const router = useRouter()
 const isSidebarCollapsed = ref(false)
+
+// 현재 사용자 정보를 반응형 ref로 관리
+const currentUser = ref(authService.getUser())
+
+// 라우트 변경 시 사용자 정보 업데이트
+watch(route, () => {
+  const user = authService.getUser()
+  currentUser.value = user
+  console.log('👤 사용자 정보 업데이트:', user)
+}, { immediate: true })
+
+// 컴포넌트 마운트 시 사용자 정보 로드
+onMounted(() => {
+  currentUser.value = authService.getUser()
+})
 
 const toggleSidebarCollapse = () => {
   isSidebarCollapsed.value = !isSidebarCollapsed.value
+}
+
+const logout = () => {
+  console.log('🚪 로그아웃 실행')
+  authService.logout()
+  currentUser.value = null // 즉시 UI 업데이트
+  console.log('👤 사용자 정보 초기화:', currentUser.value)
+  router.push('/login')
 }
 </script>
 
@@ -15,7 +40,7 @@ const toggleSidebarCollapse = () => {
     <!-- 사이드바 -->
     <div
       :class="[
-        'bg-white shadow-lg transition-all duration-300 ease-in-out',
+        'bg-white shadow-lg transition-all duration-300 ease-in-out flex flex-col',
         isSidebarCollapsed ? 'w-16' : 'w-52'
       ]"
     >
@@ -72,7 +97,7 @@ const toggleSidebarCollapse = () => {
       </div>
 
       <!-- 사이드바 메뉴 -->
-      <nav :class="['mt-6', isSidebarCollapsed ? 'px-1' : 'px-4']">
+      <nav :class="['mt-6 flex-1', isSidebarCollapsed ? 'px-1' : 'px-4']">
         <div :class="isSidebarCollapsed ? 'space-y-1' : 'space-y-2'">
           <!-- 홈 -->
           <div class="relative group">
@@ -256,6 +281,84 @@ const toggleSidebarCollapse = () => {
               class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50"
             >
               MSP 관리
+            </div>
+          </div>
+
+          <!-- 관리자 페이지 -->
+          <div v-if="currentUser && (currentUser.role === 'admin' || currentUser.role === 'power_user') && currentUser.is_active" class="relative group">
+            <router-link
+              to="/admin"
+              :class="[
+                'flex items-center text-sm font-medium rounded-lg transition-all duration-200 bg-red-50 border border-red-200',
+                isSidebarCollapsed ? 'justify-center w-12 h-10 mx-auto' : 'px-4 py-3',
+                route.name === 'admin' 
+                  ? 'bg-red-100 text-red-700' 
+                  : 'text-red-600 hover:bg-red-100 hover:text-red-700'
+              ]"
+            >
+              <svg class="w-5 h-5 flex-shrink-0" :class="isSidebarCollapsed ? '' : 'mr-3'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span v-if="!isSidebarCollapsed" class="transition-all duration-300">
+                {{ currentUser.role === 'admin' ? '관리자 페이지' : '파워유저 페이지' }}
+              </span>
+            </router-link>
+            <!-- 툴팁 -->
+            <div 
+              v-if="isSidebarCollapsed"
+              class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50"
+            >
+              {{ currentUser.role === 'admin' ? '관리자 페이지' : '파워유저 페이지' }}
+            </div>
+          </div>
+
+          <!-- 내 프로필 -->
+          <div class="relative group">
+            <router-link
+              to="/profile"
+              :class="[
+                'flex items-center text-sm font-medium rounded-lg transition-all duration-200',
+                isSidebarCollapsed ? 'justify-center w-12 h-10 mx-auto' : 'px-4 py-3',
+                route.name === 'profile' 
+                  ? 'bg-gray-100 text-gray-700' 
+                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+              ]"
+            >
+              <svg class="w-5 h-5 flex-shrink-0" :class="isSidebarCollapsed ? '' : 'mr-3'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <span v-if="!isSidebarCollapsed" class="transition-all duration-300">내 프로필</span>
+            </router-link>
+            <!-- 툴팁 -->
+            <div 
+              v-if="isSidebarCollapsed"
+              class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50"
+            >
+              내 프로필
+            </div>
+          </div>
+          
+          <!-- 로그아웃 -->
+          <div class="relative group mt-1">
+            <button
+              @click="logout"
+              :class="[
+                'w-full flex items-center text-sm font-medium rounded-lg transition-all duration-200 text-red-600 hover:bg-red-50 hover:text-red-700',
+                isSidebarCollapsed ? 'justify-center h-10 mx-auto' : 'px-4 py-3'
+              ]"
+            >
+              <svg class="w-5 h-5 flex-shrink-0" :class="isSidebarCollapsed ? '' : 'mr-3'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span v-if="!isSidebarCollapsed" class="transition-all duration-300">로그아웃</span>
+            </button>
+            <!-- 툴팁 -->
+            <div 
+              v-if="isSidebarCollapsed"
+              class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50"
+            >
+              로그아웃
             </div>
           </div>
         </div>

@@ -76,6 +76,13 @@ def init_db():
     print(f"✅ 데이터베이스 초기화 완료: {DATABASE_PATH}")
 
 
+def get_database_url():
+    """
+    데이터베이스 URL 반환
+    """
+    return SQLALCHEMY_DATABASE_URL
+
+
 def get_db_info():
     """
     데이터베이스 정보 반환

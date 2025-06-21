@@ -21,6 +21,7 @@ export interface Member extends BaseEntity {
   join_date?: string
   profile_image?: string
   is_active: boolean
+  role: string
 }
 
 export interface MemberCreate {
@@ -45,6 +46,7 @@ export interface MemberUpdate {
   join_date?: string
   profile_image?: string
   is_active?: boolean
+  role?: string
 }
 
 export interface MemberListResponse {

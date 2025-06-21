@@ -3,11 +3,13 @@
 """
 
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..services.notice_service import NoticeService
+from ..services.auth_service import get_current_user, can_create_notice
+from ..models.member import Member
 from ..schemas.notice import (
     NoticeCreate,
     NoticeUpdate,
@@ -28,9 +30,26 @@ def get_notice_service(db: Session = Depends(get_db)) -> NoticeService:
 @router.post("/", response_model=NoticeResponse, summary="공지사항 생성")
 async def create_notice(
     notice_data: NoticeCreate,
-    service: NoticeService = Depends(get_notice_service)
+    service: NoticeService = Depends(get_notice_service),
+    current_user: Member = Depends(get_current_user)
 ):
-    """새로운 공지사항을 생성합니다."""
+    """
+    새로운 공지사항을 생성합니다.
+    
+    권한별 생성 가능 범위:
+    - 관리자/파워유저: 모든 우선순위 공지사항 생성 가능
+    - 일반유저: 일반 우선순위만 생성 가능
+    """
+    # 권한 체크
+    if not can_create_notice(current_user, notice_data.priority):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"'{notice_data.priority}' 우선순위 공지사항을 생성할 권한이 없습니다. 일반 유저는 '일반' 우선순위만 생성 가능합니다."
+        )
+    
+    # 작성자 ID 설정
+    notice_data.author_id = current_user.id
+    
     try:
         return service.create_notice(notice_data)
     except ValueError as e:
