@@ -84,6 +84,11 @@ TS Portal은 Saltware CSG TS팀을 위한 통합 관리 플랫폼입니다. 팀�
 
 ### Backend Services
 
+#### 🚀 개발 도구
+- **UV** - 극도로 빠른 Python 패키지 관리 도구 (Rust 기반)
+- **pyproject.toml** - 현대적 Python 프로젝트 설정
+- **uv.lock** - 정확한 의존성 버전 고정
+
 #### 🍯 HoneyBox (RSS 수집 서비스)
 - **FastAPI** - 고성능 비동기 웹 프레임워크
 - **Pydantic** - 데이터 검증 및 직렬화
@@ -247,6 +252,34 @@ npm run dev
 # http://localhost:5173
 ```
 
+### 4. 마이크로서비스 개별 개발 ⚡
+```bash
+# 🚀 Auth Service
+cd services/auth-service
+uv sync                    # 의존성 설치 (48ms에 완료!)
+uv run uvicorn app.main:app --reload --port 8010
+
+# 👥 Member Service  
+cd services/member-service
+uv sync
+uv run uvicorn app.main:app --reload --port 8001
+
+# 🏢 Customer Service
+cd services/customer-service  
+uv sync
+uv run uvicorn app.main:app --reload --port 8002
+
+# 📅 Calendar Service
+cd services/calendar-service
+uv sync
+uv run uvicorn app.main:app --reload --port 8003
+
+# 📢 Notice Service
+cd services/notice-service
+uv sync
+uv run uvicorn app.main:app --reload --port 8004
+```
+
 ### 4. 접속 URL
 - **메인 포털**: http://localhost:5173
 - **마이크로서비스 API 문서**:
@@ -370,6 +403,6 @@ terraform apply
 ---
 
 <div align="center">
-  <p>Made with ❤️ by TS Team</p>
-  <p>© 2024 Saltware CSG. All rights reserved.</p>
+  <p>Made with ❤️ by TS Team Seungdo Bae</p>
+  <p>© 2025 Saltware CSG. All rights reserved.</p>
 </div>
