@@ -1,90 +1,178 @@
 services:
-  nginx:
-    image: nginx:alpine
-    container_name: ts-portal-nginx
-    ports:
-      - "80:80"
-      - "443:443"
+  # PostgreSQL 데이터베이스
+  postgres:
+    image: postgres:15-alpine
+    container_name: ts-portal-postgres
+    environment:
+      POSTGRES_USER: tsportal
+      POSTGRES_PASSWORD: tsportal123!
+      POSTGRES_DB: tsportal
+      POSTGRES_INITDB_ARGS: "-E UTF-8"
     volumes:
-      # Nginx 설정 파일
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      # SSL 인증서 (Let's Encrypt)
-      - ./ssl:/etc/letsencrypt:ro
-      # Nginx 로그
-      - ./logs/nginx:/var/log/nginx
-    depends_on:
-      - honeybox
-      - ts-portal-db
-    restart: unless-stopped
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tsportal"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - ts-portal-network
 
+  # Redis (캐싱)
+  redis:
+    image: redis:7-alpine
+    container_name: ts-portal-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - ts-portal-network
+
+  # Notice Service (첫 번째 마이크로서비스!)
+  notice-service:
+    build:
+      context: ./services/notice-service
+      dockerfile: Dockerfile
+    container_name: ts-portal-notice-service
+    ports:
+      - "8004:8004"
+    environment:
+      - PYTHONPATH=/app
+      - DATABASE_URL=postgresql://tsportal:tsportal123!@postgres:5432/tsportal
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./logs/notice-service:/app/logs
+    networks:
+      - ts-portal-network
+
+  # Calendar Service (두 번째 마이크로서비스!)
+  calendar-service:
+    build:
+      context: ./services/calendar-service
+      dockerfile: Dockerfile
+    container_name: ts-portal-calendar-service
+    ports:
+      - "8003:8003"
+    environment:
+      - PYTHONPATH=/app
+      - DATABASE_URL=postgresql://tsportal:tsportal123!@postgres:5432/tsportal
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./logs/calendar-service:/app/logs
+    networks:
+      - ts-portal-network
+
+  # Customer Service (세 번째 마이크로서비스!)
+  customer-service:
+    build:
+      context: ./services/customer-service
+      dockerfile: Dockerfile
+    container_name: ts-portal-customer-service
+    ports:
+      - "8002:8002"
+    environment:
+      - PYTHONPATH=/app
+      - DATABASE_URL=postgresql://tsportal:tsportal123!@postgres:5432/tsportal
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./logs/customer-service:/app/logs
+    networks:
+      - ts-portal-network
+
+  # Member Service (네 번째 마이크로서비스!)
+  member-service:
+    build:
+      context: ./services/member-service
+      dockerfile: Dockerfile
+    container_name: ts-portal-member-service
+    ports:
+      - "8001:8001"
+    environment:
+      - PYTHONPATH=/app
+      - DATABASE_URL=postgresql://tsportal:tsportal123!@postgres:5432/tsportal
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./logs/member-service:/app/logs
+    networks:
+      - ts-portal-network
+
+  # Auth Service (다섯 번째 마이크로서비스!)
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    container_name: ts-portal-auth-service
+    ports:
+      - "8010:8010"
+    environment:
+      - PYTHONPATH=/app
+      - DATABASE_URL=postgresql://tsportal:tsportal123!@postgres:5432/tsportal
+      - JWT_SECRET_KEY=your-super-secret-jwt-key-change-in-production
+      - JWT_EXPIRE_MINUTES=1440
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./logs/auth-service:/app/logs
+    networks:
+      - ts-portal-network
+
+  # HoneyBox (기존 서비스 유지)
   honeybox:
     build: 
       context: ./honeybox
       dockerfile: Dockerfile
     container_name: ts-portal-honeybox
-    expose:
-      - "8000"
-    volumes:
-      # Redis 데이터 (향후 Redis 컨테이너 추가 시)
-      - ./data/redis:/data
-      # 애플리케이션 로그
-      - ./logs/honeybox:/app/logs
+    ports:
+      - "8000:8000"
     environment:
       - PYTHONPATH=/app
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-    restart: unless-stopped
+    depends_on:
+      - redis
+    volumes:
+      - ./logs/honeybox:/app/logs
     networks:
       - ts-portal-network
 
-  ts-portal-db:
-    build:
-      context: ./ts-portal-db
-      dockerfile: Dockerfile
-    container_name: ts-portal-db
-    expose:
-      - "8001"
-    volumes:
-      # SQLite 데이터베이스 영구 저장
-      - ./data/sqlite:/app/data
-      # 애플리케이션 로그
-      - ./logs/ts-portal-db:/app/logs
+
+
+  # pgAdmin (데이터베이스 관리 도구)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: ts-portal-pgadmin
     environment:
-      - PYTHONPATH=/app
-      - DATABASE_URL=sqlite:///./data/ts_portal.db
-      # JWT 설정
-      - JWT_SECRET_KEY=your-super-secret-jwt-key-change-in-production
-      - JWT_EXPIRE_MINUTES=1440
-      # 기본 관리자 계정 설정
-      - ADMIN_EMAIL=admin@saltware.co.kr
-      - ADMIN_PASSWORD=admin123!
-      - ADMIN_NAME=관리자
-    restart: unless-stopped
+      PGADMIN_DEFAULT_EMAIL: admin@tsportal.com
+      PGADMIN_DEFAULT_PASSWORD: admin123!
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
     networks:
       - ts-portal-network
 
-  # Redis (HoneyBox 캐싱용)
-  redis:
-    image: redis:7-alpine
-    container_name: ts-portal-redis
-    expose:
-      - "6379"
-    volumes:
-      # Redis 데이터 영구 저장
-      - ./data/redis:/data
-    command: redis-server --appendonly yes
-    restart: unless-stopped
-    networks:
-      - ts-portal-network
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
 
 networks:
   ts-portal-network:
     driver: bridge
-    name: ts-portal-network
-
-volumes:
-  # 명시적 볼륨 정의 (선택적)
-  ts-portal-data:
-    driver: local 
+    name: ts-portal-network 

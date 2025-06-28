@@ -64,10 +64,13 @@ export interface MemberStats {
 // 고객사 관련 타입들
 export interface Customer extends BaseEntity {
   company_name: string
-  contact_person?: string
+  main_assignee_id?: number | null
+  sub_assignee_id?: number | null
+  main_assignee?: Member | null
+  sub_assignee?: Member | null
   contact_email?: string
   contact_phone?: string
-  contract_type?: string
+  support_level?: string
   contract_start?: string
   contract_end?: string
   status: string
@@ -78,10 +81,11 @@ export interface Customer extends BaseEntity {
 
 export interface CustomerCreate {
   company_name: string
-  contact_person?: string
+  main_assignee_id?: number | null
+  sub_assignee_id?: number | null
   contact_email?: string
   contact_phone?: string
-  contract_type?: string
+  support_level?: string
   contract_start?: string
   contract_end?: string
   status?: string
@@ -90,10 +94,11 @@ export interface CustomerCreate {
 
 export interface CustomerUpdate {
   company_name?: string
-  contact_person?: string
+  main_assignee_id?: number | null
+  sub_assignee_id?: number | null
   contact_email?: string
   contact_phone?: string
-  contract_type?: string
+  support_level?: string
   contract_start?: string
   contract_end?: string
   status?: string
