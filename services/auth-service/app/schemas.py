@@ -14,7 +14,7 @@ from .models import UserRole
 # 로그인 요청
 class LoginRequest(BaseModel):
     """로그인 요청 스키마"""
-    email: EmailStr = Field(..., description="이메일")
+    username: str = Field(..., min_length=1, max_length=50, description="로그인 ID")
     password: str = Field(..., min_length=1, description="비밀번호")
 
 

@@ -51,7 +51,7 @@ import type { Member } from '@/types'
 // Props 정의
 interface Props {
   currentView: string
-  loadEvents: () => Promise<any[]>
+  loadEvents: (info: any) => Promise<any[]>
   members: Member[]
   selectedMembers: Set<number>
   isAllSelected: boolean

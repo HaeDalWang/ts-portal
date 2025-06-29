@@ -27,6 +27,7 @@ class Member(Base):
     # 기본 정보
     id = Column(Integer, primary_key=True, index=True, comment="팀원 고유 ID")
     name = Column(String(50), nullable=False, comment="이름")
+    username = Column(String(50), unique=True, nullable=True, index=True, comment="로그인 ID")
     email = Column(String(100), unique=True, nullable=False, index=True, comment="이메일")
     phone = Column(String(20), comment="전화번호")
     
@@ -34,8 +35,6 @@ class Member(Base):
     password_hash = Column(String(255), comment="비밀번호 해시")
     role = Column(Enum(UserRole), default=UserRole.USER, nullable=False, comment="사용자 권한")
     last_login = Column(DateTime, comment="마지막 로그인 시간")
-    mfa_enabled = Column(Boolean, default=False, comment="MFA 활성화 여부")
-    mfa_secret = Column(String(100), comment="MFA 시크릿 키")
     
     # 직무 정보
     position = Column(String(50), comment="직급/직책 (예: 선임, 책임, 팀장)")
@@ -47,7 +46,7 @@ class Member(Base):
     is_active = Column(Boolean, default=True, comment="재직 여부")
     
     # 추가 정보
-    profile_image = Column(String(200), comment="프로필 사진 URL")
+    profile_image_url = Column(String(500), comment="프로필 사진 URL")
     
     # 시스템 정보
     created_at = Column(DateTime, default=datetime.utcnow, comment="생성일시")
@@ -78,6 +77,7 @@ class Member(Base):
         return {
             "id": self.id,
             "name": self.name,
+            "username": self.username,
             "email": self.email,
             "role": self.role.value,
             "position": self.position,

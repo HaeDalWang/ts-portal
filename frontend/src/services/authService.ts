@@ -16,6 +16,7 @@ export enum UserRole {
 export interface User {
   id: number
   name: string
+  username: string
   email: string
   phone?: string
   position?: string
@@ -31,7 +32,7 @@ export interface User {
 
 // 로그인 요청 타입
 export interface LoginRequest {
-  email: string
+  username: string
   password: string
 }
 
@@ -60,37 +61,35 @@ class AuthService {
    */
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     try {
-      const response = await api.post<any>('/auth/login', credentials)
+      // Kong API Gateway를 통한 Auth Service 연결
+      const authUrl = 'http://localhost:8080/api/auth/login'
+      const response = await fetch(authUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials)
+      })
       
-      console.log('🔐 로그인 응답:', response)
-      
-      // API 응답 구조 확인 후 적절히 처리
-      let token: string
-      let user: User
-      
-      if (response.access_token) {
-        // 응답에 직접 토큰이 있는 경우
-        token = response.access_token
-        user = response.user
-      } else if (response.data && response.data.access_token) {
-        // 응답이 data 객체로 감싸진 경우
-        token = response.data.access_token
-        user = response.data.user
-      } else {
-        throw new Error('로그인 응답 형식이 올바르지 않습니다.')
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`)
       }
       
+      const data = await response.json()
+      
+      console.log('🔐 로그인 응답:', data)
+      
       // 토큰과 사용자 정보 저장
-      this.setToken(token)
-      this.setUser(user)
+      this.setToken(data.access_token)
+      this.setUser(data.user)
       
-      console.log('🔐 토큰 저장됨:', token)
-      console.log('👤 사용자 정보 저장됨:', user)
+      console.log('🔐 토큰 저장됨:', data.access_token)
+      console.log('👤 사용자 정보 저장됨:', data.user)
       
-      return response
+      return data
     } catch (error) {
       console.error('🔐 로그인 에러:', error)
-      throw new Error('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.')
+      throw new Error('로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.')
     }
   }
 

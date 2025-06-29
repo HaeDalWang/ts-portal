@@ -1,0 +1,55 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: auth-service
+    url: http://auth-service:8010
+    routes:
+      - name: auth-routes
+        paths: ["/api/auth"]
+        strip_path: false
+        methods: [GET, POST, PUT, DELETE]
+
+  - name: member-service
+    url: http://member-service:8001
+    routes:
+      - name: member-routes
+        paths: ["/api/members"]
+        strip_path: false
+        methods: [GET, POST, PUT, DELETE]
+
+  - name: customer-service
+    url: http://customer-service:8002
+    routes:
+      - name: customer-routes
+        paths: ["/api/customers"]
+        strip_path: false
+        methods: [GET, POST, PUT, DELETE]
+      - name: assignment-routes
+        paths: ["/api/assignments"]
+        strip_path: false
+        methods: [GET, POST, PUT, DELETE]
+
+  - name: calendar-service
+    url: http://calendar-service:8003
+    routes:
+      - name: calendar-routes
+        paths: ["/api/events"]
+        strip_path: false
+        methods: [GET, POST, PUT, DELETE]
+
+  - name: notice-service
+    url: http://notice-service:8004
+    routes:
+      - name: notice-routes
+        paths: ["/api/notices"]
+        strip_path: false
+        methods: [GET, POST, PUT, DELETE]
+
+  - name: feeds-service
+    url: http://feeds-service:8000
+    routes:
+      - name: feeds-routes
+        paths: ["/api/feeds"]
+        strip_path: false
+        methods: [GET, POST, PUT, DELETE] 

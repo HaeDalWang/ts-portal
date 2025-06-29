@@ -88,7 +88,7 @@ export const customerService = {
   async getMspCustomers(): Promise<Customer[]> {
     const allCustomers = await this.getActiveCustomers()
     return allCustomers.filter(customer => 
-      customer.contract_type?.toLowerCase().includes('msp')
+      customer.support_level?.toLowerCase().includes('msp')
     )
   },
 
@@ -96,7 +96,7 @@ export const customerService = {
   async getConsultingCustomers(): Promise<Customer[]> {
     const allCustomers = await this.getActiveCustomers()
     return allCustomers.filter(customer => 
-      customer.contract_type?.toLowerCase().includes('consulting')
+      customer.support_level?.toLowerCase().includes('consulting')
     )
   }
 }

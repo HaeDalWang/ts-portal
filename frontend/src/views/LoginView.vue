@@ -14,18 +14,18 @@
 
       <!-- 로그인 폼 -->
       <form @submit.prevent="handleLogin" class="space-y-6">
-        <!-- 이메일 입력 -->
+        <!-- 아이디 입력 -->
         <div>
-          <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-            이메일
+          <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+            아이디
           </label>
           <input
-            id="email"
-            v-model="loginForm.email"
-            type="email"
+            id="username"
+            v-model="loginForm.username"
+            type="text"
             required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-            placeholder="your@email.com"
+            placeholder="아이디를 입력하세요"
             :disabled="isLoading"
           />
         </div>
@@ -75,7 +75,7 @@
         <!-- 로그인 버튼 -->
         <button
           type="submit"
-          :disabled="isLoading || !loginForm.email || !loginForm.password"
+          :disabled="isLoading || !loginForm.username || !loginForm.password"
           class="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:from-purple-700 hover:to-blue-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span v-if="isLoading" class="flex items-center justify-center">
@@ -113,7 +113,7 @@ const showPassword = ref(false)
 const errorMessage = ref('')
 
 const loginForm = reactive<LoginRequest>({
-  email: '',
+  username: '',
   password: ''
 })
 
@@ -125,7 +125,7 @@ const handleLogin = async () => {
 
     // 로그인 시도
     await authService.login({
-      email: loginForm.email,
+      username: loginForm.username,
       password: loginForm.password
     })
 

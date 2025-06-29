@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 import jwt
 from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
+from sqlalchemy import text
 
 from .models import Member, UserRole
 from .schemas import LoginRequest, TokenResponse, JWTPayload
@@ -56,6 +57,7 @@ class AuthService:
             # JWT 페이로드 생성
             payload = {
                 "user_id": user.id,
+                "username": user.username,
                 "email": user.email,
                 "role": user.role.value,
                 "exp": expire,
@@ -119,40 +121,76 @@ class AuthService:
     
     def authenticate_user(self, login_data: LoginRequest) -> Optional[Member]:
         """
-        사용자 인증
+        사용자 인증 (Username + Password 방식)
         
         Args:
-            login_data: 로그인 요청 데이터
+            login_data: 로그인 요청 데이터 (username, password)
             
         Returns:
             Member: 인증된 사용자 객체 또는 None
         """
         try:
-            # 이메일로 사용자 조회
-            user = self.db.query(Member).filter(
-                Member.email == login_data.email,
-                Member.is_active == True
-            ).first()
+            logger.info(f"🔍 로그인 시도: {login_data.username}")
             
-            if not user:
-                logger.warning(f"존재하지 않는 사용자: {login_data.email}")
+            # Raw SQL로 사용자 조회 (username으로 검색)
+            result = self.db.execute(text('''
+                SELECT id, name, username, email, phone, password_hash, role, last_login, 
+                       position, team, skills, join_date, is_active, profile_image_url,
+                       created_at, updated_at
+                FROM member_schema.members 
+                WHERE username = :username AND is_active = true
+            '''), {"username": login_data.username}).fetchone()
+            
+            if not result:
+                logger.warning(f"❌ 존재하지 않는 사용자: {login_data.username}")
                 return None
+            
+            logger.info(f"✅ 사용자 찾음: {result[1]} ({result[2]}), 저장된 해시: {result[5]}")
+            
+            # 입력된 비밀번호의 해시 생성
+            input_hash = self.hash_password(login_data.password)
+            logger.info(f"🔑 입력 비밀번호 '{login_data.password}' 해시: {input_hash}")
             
             # 비밀번호 검증
-            if not self.verify_password(login_data.password, user.password_hash):
-                logger.warning(f"비밀번호 불일치: {login_data.email}")
+            if not self.verify_password(login_data.password, result[5]):
+                logger.warning(f"❌ 비밀번호 불일치: {login_data.username}")
+                logger.warning(f"   저장된 해시: {result[5]}")
+                logger.warning(f"   입력 해시:   {input_hash}")
                 return None
             
+            # Member 객체 생성 (ORM 없이 직접 생성)
+            user = Member()
+            user.id = result[0]
+            user.name = result[1]
+            user.username = result[2]
+            user.email = result[3]
+            user.phone = result[4]
+            user.password_hash = result[5]
+            user.role = UserRole(result[6])  # enum 값으로 변환
+            user.last_login = result[7]
+            user.position = result[8]
+            user.team = result[9]
+            user.skills = result[10]
+            user.join_date = result[11]
+            user.is_active = result[12]
+            user.profile_image_url = result[13]
+            user.created_at = result[14]
+            user.updated_at = result[15]
+            
             # 마지막 로그인 시간 업데이트
-            user.last_login = datetime.utcnow()
+            self.db.execute(text('''
+                UPDATE member_schema.members 
+                SET last_login = NOW() 
+                WHERE id = :user_id
+            '''), {"user_id": user.id})
             self.db.commit()
             
-            logger.info(f"사용자 인증 성공: {user.email}")
+            logger.info(f"🎉 사용자 인증 성공: {user.username} ({user.name})")
             return user
             
         except Exception as e:
             self.db.rollback()
-            logger.error(f"사용자 인증 실패: {e}")
+            logger.error(f"💥 사용자 인증 실패: {e}")
             return None
     
     def get_user_by_id(self, user_id: int) -> Optional[Member]:
@@ -166,13 +204,78 @@ class AuthService:
             logger.error(f"사용자 조회 실패: {e}")
             return None
     
-    def get_user_by_email(self, email: str) -> Optional[Member]:
-        """이메일로 사용자 조회"""
+    def get_user_by_username(self, username: str) -> Optional[Member]:
+        """Username으로 사용자 조회"""
         try:
-            return self.db.query(Member).filter(
-                Member.email == email,
-                Member.is_active == True
-            ).first()
+            result = self.db.execute(text('''
+                SELECT id, name, username, email, phone, password_hash, role, last_login, 
+                       position, team, skills, join_date, is_active, profile_image_url,
+                       created_at, updated_at
+                FROM member_schema.members 
+                WHERE username = :username AND is_active = true
+            '''), {"username": username}).fetchone()
+            
+            if not result:
+                return None
+                
+            # Member 객체 생성
+            user = Member()
+            user.id = result[0]
+            user.name = result[1]
+            user.username = result[2]
+            user.email = result[3]
+            user.phone = result[4]
+            user.password_hash = result[5]
+            user.role = UserRole(result[6])
+            user.last_login = result[7]
+            user.position = result[8]
+            user.team = result[9]
+            user.skills = result[10]
+            user.join_date = result[11]
+            user.is_active = result[12]
+            user.profile_image_url = result[13]
+            user.created_at = result[14]
+            user.updated_at = result[15]
+            
+            return user
+        except Exception as e:
+            logger.error(f"사용자 조회 실패: {e}")
+            return None
+    
+    def get_user_by_email(self, email: str) -> Optional[Member]:
+        """이메일로 사용자 조회 (기존 호환성 유지)"""
+        try:
+            result = self.db.execute(text('''
+                SELECT id, name, username, email, phone, password_hash, role, last_login, 
+                       position, team, skills, join_date, is_active, profile_image_url,
+                       created_at, updated_at
+                FROM member_schema.members 
+                WHERE email = :email AND is_active = true
+            '''), {"email": email}).fetchone()
+            
+            if not result:
+                return None
+                
+            # Member 객체 생성
+            user = Member()
+            user.id = result[0]
+            user.name = result[1]
+            user.username = result[2]
+            user.email = result[3]
+            user.phone = result[4]
+            user.password_hash = result[5]
+            user.role = UserRole(result[6])
+            user.last_login = result[7]
+            user.position = result[8]
+            user.team = result[9]
+            user.skills = result[10]
+            user.join_date = result[11]
+            user.is_active = result[12]
+            user.profile_image_url = result[13]
+            user.created_at = result[14]
+            user.updated_at = result[15]
+            
+            return user
         except Exception as e:
             logger.error(f"사용자 조회 실패: {e}")
             return None
@@ -195,7 +298,7 @@ class AuthService:
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="이메일 또는 비밀번호가 일치하지 않습니다.",
+                detail="아이디 또는 비밀번호가 일치하지 않습니다.",
                 headers={"WWW-Authenticate": "Bearer"},
             )
         

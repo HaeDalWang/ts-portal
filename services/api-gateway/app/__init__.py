@@ -1,1 +1,0 @@
-# TS Portal API Gateway 애플리케이션 

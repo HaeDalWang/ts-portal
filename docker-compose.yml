@@ -33,24 +33,23 @@ services:
     networks:
       - ts-portal-network
 
-  # 🚀 API Gateway (NEW!)
-  api-gateway:
-    build:
-      context: ./services/api-gateway
-      dockerfile: Dockerfile
-    container_name: ts-portal-api-gateway
-    ports:
-      - "8080:8080"
+  # Kong API Gateway (기존 api-gateway 대체)
+  kong:
+    image: kong:3.9.1
+    container_name: ts-portal-kong
     environment:
-      - PYTHONPATH=/app
-      - JWT_SECRET_KEY=your-super-secret-jwt-key-change-in-production
-      - JWT_EXPIRE_MINUTES=1440
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-    depends_on:
-      - redis
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /kong/declarative/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
     volumes:
-      - ./logs/api-gateway:/app/logs
+      - ./kong:/kong/declarative
+    ports:
+      - "8080:8000"  # 프록시 포트 (기존 API Gateway와 동일)
+      - "8888:8001"  # 관리 포트
     networks:
       - ts-portal-network
 

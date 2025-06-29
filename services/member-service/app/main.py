@@ -67,7 +67,7 @@ app.add_middleware(
 )
 
 # 라우터 등록
-app.include_router(member_router, prefix="/api/v1/members", tags=["members"])
+app.include_router(member_router, prefix="/api/members", tags=["members"])
 
 @app.get("/")
 async def root():

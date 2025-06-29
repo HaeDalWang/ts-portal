@@ -71,7 +71,7 @@ app.add_middleware(
 security = HTTPBearer()
 
 # 라우터 등록
-app.include_router(auth_router, prefix="/api/v1/auth", tags=["authentication"])
+app.include_router(auth_router, prefix="/api/auth", tags=["authentication"])
 
 @app.get("/")
 async def root():
@@ -82,11 +82,11 @@ async def root():
         "status": "healthy",
         "description": "인증/인가 마이크로서비스",
         "endpoints": {
-            "/api/v1/auth/login": "로그인",
-            "/api/v1/auth/logout": "로그아웃",
-            "/api/v1/auth/verify": "토큰 검증",
-            "/api/v1/auth/refresh": "토큰 갱신",
-            "/api/v1/auth/me": "현재 사용자 정보",
+            "/api/auth/login": "로그인",
+            "/api/auth/logout": "로그아웃",
+            "/api/auth/verify": "토큰 검증",
+            "/api/auth/refresh": "토큰 갱신",
+            "/api/auth/me": "현재 사용자 정보",
             "/health": "헬스 체크",
             "/docs": "API 문서"
         }

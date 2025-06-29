@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import List, Dict, Any
 import feedparser
 import httpx
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 
 # 로깅 설정
@@ -57,6 +57,9 @@ AWS_FEEDS = {
     }
 }
 
+# APIRouter 생성
+feeds_router = APIRouter()
+
 
 async def fetch_feed(feed_url: str, limit: int = 10) -> List[Dict[str, Any]]:
     """RSS 피드를 가져와서 파싱합니다."""
@@ -95,9 +98,10 @@ async def root():
         "timestamp": datetime.now().isoformat(),
         "feeds_count": len(AWS_FEEDS),
         "endpoints": {
-            "/feeds": "사용 가능한 피드 목록",
-            "/feeds/all": "모든 피드 최신 소식",
-            "/feeds/{feed_id}": "특정 피드 조회",
+            "/api/feeds": "사용 가능한 피드 목록",
+            "/api/feeds/all": "모든 피드 최신 소식",
+            "/api/feeds/{feed_id}": "특정 피드 조회",
+            "/api/feeds/latest": "최신 AWS 소식",
             "/health": "헬스체크"
         }
     }
@@ -114,7 +118,7 @@ async def health_check():
     }
 
 
-@app.get("/feeds")
+@feeds_router.get("/")
 async def get_feeds():
     """사용 가능한 피드 목록을 반환합니다."""
     return {
@@ -123,7 +127,7 @@ async def get_feeds():
     }
 
 
-@app.get("/feeds/all")
+@feeds_router.get("/all")
 async def get_all_feeds(limit: int = 5):
     """모든 피드에서 최신 소식을 가져옵니다."""
     all_items = []
@@ -148,7 +152,7 @@ async def get_all_feeds(limit: int = 5):
     }
 
 
-@app.get("/feeds/{feed_id}")
+@feeds_router.get("/{feed_id}")
 async def get_feed(feed_id: str, limit: int = 10):
     """특정 피드의 최신 소식을 가져옵니다."""
     if feed_id not in AWS_FEEDS:
@@ -167,7 +171,7 @@ async def get_feed(feed_id: str, limit: int = 10):
     }
 
 
-@app.get("/feeds/latest")
+@feeds_router.get("/latest")
 async def get_latest_news(limit: int = 3):
     """오늘의 AWS 소식 (가장 간단한 버전)"""
     items = await fetch_feed(AWS_FEEDS["aws-news"]["url"], limit)
@@ -177,6 +181,10 @@ async def get_latest_news(limit: int = 3):
         "total": len(items),
         "timestamp": datetime.now().isoformat()
     }
+
+
+# 라우터 등록
+app.include_router(feeds_router, prefix="/api/feeds", tags=["feeds"])
 
 
 if __name__ == "__main__":
