@@ -33,6 +33,27 @@ services:
     networks:
       - ts-portal-network
 
+  # 🚀 API Gateway (NEW!)
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    container_name: ts-portal-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - PYTHONPATH=/app
+      - JWT_SECRET_KEY=your-super-secret-jwt-key-change-in-production
+      - JWT_EXPIRE_MINUTES=1440
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+    volumes:
+      - ./logs/api-gateway:/app/logs
+    networks:
+      - ts-portal-network
+
   # Notice Service (첫 번째 마이크로서비스!)
   notice-service:
     build:
@@ -130,26 +151,20 @@ services:
     networks:
       - ts-portal-network
 
-  # HoneyBox (기존 서비스 유지)
-  honeybox:
-    build: 
-      context: ./honeybox
+  # 📰 Feeds Service (경량화된 AWS 소식 수집)
+  feeds-service:
+    build:
+      context: ./services/feeds-service
       dockerfile: Dockerfile
-    container_name: ts-portal-honeybox
+    container_name: ts-portal-feeds-service
     ports:
       - "8000:8000"
     environment:
       - PYTHONPATH=/app
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-    depends_on:
-      - redis
     volumes:
-      - ./logs/honeybox:/app/logs
+      - ./logs/feeds-service:/app/logs
     networks:
       - ts-portal-network
-
-
 
   # pgAdmin (데이터베이스 관리 도구)
   pgadmin:
