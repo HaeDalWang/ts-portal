@@ -1,0 +1,6 @@
+export { default as NoticesHeader } from './NoticesHeader.vue'
+export { default as NoticesSearchFilter } from './NoticesSearchFilter.vue'
+export { default as NoticesCardView } from './NoticesCardView.vue'
+export { default as NoticesTableView } from './NoticesTableView.vue'
+export { default as NoticeDetailModal } from './NoticeDetailModal.vue'
+export { default as NoticeFormModal } from './NoticeFormModal.vue' 

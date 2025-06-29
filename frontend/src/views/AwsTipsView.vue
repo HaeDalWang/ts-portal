@@ -44,8 +44,10 @@ const error = ref<string | null>(null)
 const dailyTipData = ref<DailyTipResponse | null>(null)
 const enableTranslation = ref(false)
 
-// HoneyBox API 설정 - 환경변수 사용
-const HONEYBOX_API_URL = import.meta.env.VITE_HONEYBOX_API_URL || 'http://localhost:8000'
+// HoneyBox API URL을 환경변수 기반으로 설정
+const HONEYBOX_API_URL = import.meta.env.VITE_API_BASE_URL 
+  ? `${import.meta.env.VITE_API_BASE_URL}/feeds`
+  : 'http://localhost:8080/api/feeds'
 
 // 개발 중 API URL 로깅 (배포시 제거 가능)
 console.log('HoneyBox API URL:', HONEYBOX_API_URL)

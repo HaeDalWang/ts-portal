@@ -1,0 +1,226 @@
+/* FullCalendar 완전 일체화 스타일 */
+.fc {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.fc-view-harness {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.fc-daygrid {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.fc-scrollgrid {
+  border: none !important;
+}
+
+.fc-theme-standard .fc-scrollgrid {
+  border: none !important;
+}
+
+.fc-scrollgrid-section {
+  border: none !important;
+}
+
+.fc-scrollgrid-section-header {
+  border-top: none !important;
+}
+
+.fc-col-header {
+  border-top: none !important;
+}
+
+/* FullCalendar 툴바 완전 제거 */
+.fc-header-toolbar {
+  display: none !important;
+}
+
+.fc-toolbar {
+  display: none !important;
+}
+
+.fc-toolbar-chunk {
+  display: none !important;
+}
+
+/* 달력 셀 스타일 - 최대한 크게 */
+.fc-daygrid-day {
+  border: 1px solid #e5e7eb;
+  min-height: 140px !important;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* 날짜 셀 호버 효과 */
+.fc-daygrid-day:hover {
+  background-color: #f8fafc !important;
+}
+
+/* 오늘 날짜 호버 효과 */
+.fc-day-today:hover {
+  background-color: #e0f2fe !important;
+}
+
+.fc-daygrid-day-top {
+  padding: 0.5rem 0.75rem;
+  justify-content: flex-start;
+}
+
+.fc-daygrid-day-number {
+  font-size: 0.75rem !important;
+  font-weight: 400 !important;
+  color: #6b7280 !important;
+  padding: 2px 4px;
+  transition: color 0.2s ease;
+}
+
+/* 날짜 숫자 호버 효과 */
+.fc-daygrid-day:hover .fc-daygrid-day-number {
+  color: #374151 !important;
+  font-weight: 500 !important;
+}
+
+/* 달력 전체 높이 최대화 */
+.fc-daygrid-body {
+  min-height: 700px;
+}
+
+.fc-daygrid-day-frame {
+  min-height: 140px !important;
+  padding: 0;
+}
+
+/* 주말 스타일 */
+.fc-day-sat .fc-daygrid-day-number {
+  color: #2563eb !important;
+}
+
+.fc-day-sun .fc-daygrid-day-number {
+  color: #dc2626 !important;
+}
+
+.fc-day-today {
+  background-color: #f0f9ff !important;
+}
+
+.fc-day-today .fc-daygrid-day-number {
+  color: #1d4ed8 !important;
+  font-weight: 600 !important;
+  font-size: 0.75rem !important;
+}
+
+/* 이벤트 스타일 개선 - 더 컴팩트하게 */
+.fc-event {
+  border: none !important;
+  border-radius: 3px !important;
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  padding: 1px 4px !important;
+  margin: 1px 2px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  min-height: 18px !important;
+}
+
+.fc-event-title {
+  font-weight: 500 !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.fc-daygrid-event {
+  border-radius: 3px !important;
+  margin: 1px 2px !important;
+  height: 18px !important;
+}
+
+.fc-timegrid-event {
+  border-radius: 3px !important;
+  padding: 1px 3px !important;
+}
+
+/* 이벤트가 많을 때 더 보기 링크 스타일 */
+.fc-daygrid-more-link {
+  font-size: 0.65rem !important;
+  color: #6b7280 !important;
+  font-weight: 400 !important;
+  margin: 1px 2px;
+}
+
+/* 주간/일간 뷰 스타일 */
+.fc-timegrid-slot {
+  height: 3rem;
+}
+
+.fc-timegrid-axis {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.fc-col-header-cell {
+  padding: 0.25rem 0.5rem !important;
+  background-color: transparent !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  min-height: 32px !important;
+}
+
+.fc-col-header-cell-cushion {
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+  color: #374151;
+  padding: 0 !important;
+  line-height: 1.2 !important;
+}
+
+/* 현재 시간 인디케이터 */
+.fc-timegrid-now-indicator-line {
+  border-color: #ef4444 !important;
+  border-width: 2px !important;
+}
+
+.fc-timegrid-now-indicator-arrow {
+  border-color: #ef4444 !important;
+}
+
+/* 스크롤바 스타일 */
+.fc-scroller {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db #f3f4f6;
+}
+
+.fc-scroller::-webkit-scrollbar {
+  width: 8px;
+}
+
+.fc-scroller::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
+
+.fc-scroller::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+.fc-scroller::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* 텍스트 줄 제한 */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+} 

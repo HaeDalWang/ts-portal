@@ -1,25 +1,16 @@
 /**
  * API 기본 설정 및 공통 함수들
+ * 환경변수 기반으로 API URL 관리
  */
 
 import axios from 'axios'
+import { API_CONFIG, getServiceUrl } from '@/config/api.config'
+import { debugLog } from '@/config/app.config'
 
-// 환경변수에서 API URL 가져오기
-const getApiBaseUrl = (): string => {
-  // 임시로 하드코딩하여 확실히 /api 접두사 포함
-  return 'http://localhost:8001/api'
-}
-
-// API 기본 설정
-const API_BASE_URL = getApiBaseUrl()
-
-console.log(`[API Config] Base URL: ${API_BASE_URL}`)
-console.log(`[API Config] Environment: ${import.meta.env.VITE_APP_ENV || (import.meta.env.DEV ? 'development' : 'production')}`)
-
-// axios 인스턴스 생성
+// axios 인스턴스 생성 (API Gateway 기반)
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
+  baseURL: API_CONFIG.baseURL,
+  timeout: API_CONFIG.timeout,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -28,7 +19,7 @@ const apiClient = axios.create({
 // 요청 인터셉터 - 토큰 자동 추가
 apiClient.interceptors.request.use(
   (config) => {
-    console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`)
+    debugLog(`API Request: ${config.method?.toUpperCase()} ${config.url}`)
     
     // localStorage에서 토큰 가져와서 헤더에 추가
     const token = localStorage.getItem('ts_portal_token')
@@ -39,7 +30,7 @@ apiClient.interceptors.request.use(
     return config
   },
   (error) => {
-    console.error('[API Request Error]', error)
+    console.error('❌ [API Request Error]', error)
     return Promise.reject(error)
   }
 )
@@ -47,14 +38,21 @@ apiClient.interceptors.request.use(
 // 응답 인터셉터
 apiClient.interceptors.response.use(
   (response) => {
-    console.log(`[API Response] ${response.status} ${response.config.url}`)
+    debugLog(`API Response: ${response.status} ${response.config.url}`)
     return response
   },
   (error) => {
-    console.error('[API Response Error]', error.response?.data || error.message)
+    console.error('❌ [API Response Error]', error.response?.data || error.message)
     
     // 에러 메시지 한국어화
-    if (error.response?.status === 404) {
+    if (error.response?.status === 401) {
+      error.message = '인증이 필요합니다. 다시 로그인해주세요.'
+      // 토큰 만료 시 로그인 페이지로 리다이렉트
+      localStorage.removeItem('ts_portal_token')
+      window.location.href = '/login'
+    } else if (error.response?.status === 403) {
+      error.message = '접근 권한이 없습니다.'
+    } else if (error.response?.status === 404) {
       error.message = '요청한 리소스를 찾을 수 없습니다.'
     } else if (error.response?.status === 400) {
       error.message = error.response.data?.detail || '잘못된 요청입니다.'
@@ -81,6 +79,8 @@ export interface ApiResponse<T> {
 export interface PaginatedResponse<T> {
   total: number
   items: T[]
+  page?: number
+  size?: number
 }
 
 // 공통 API 함수들
@@ -106,20 +106,33 @@ export const api = {
     apiClient.delete(url).then(() => undefined),
 }
 
-// HoneyBox API용 별도 클라이언트 (AWS 뉴스 피드)
-export const createHoneyBoxClient = () => {
-  const honeyboxUrl = import.meta.env.VITE_HONEYBOX_API_URL || 
-    (import.meta.env.DEV ? 'http://localhost:8000' : 'https://tsapi.seungdobae.com/api/feeds')
-  
-  console.log(`[HoneyBox API] URL: ${honeyboxUrl}`)
+// 서비스별 API 클라이언트 생성 함수
+export const createServiceClient = (service: keyof typeof API_CONFIG.services) => {
+  const serviceUrl = getServiceUrl(service)
   
   return axios.create({
-    baseURL: honeyboxUrl,
-    timeout: 10000,
+    baseURL: serviceUrl,
+    timeout: API_CONFIG.timeout,
     headers: {
       'Content-Type': 'application/json',
     },
   })
 }
 
+// Feeds Service용 별도 클라이언트 (AWS 소식)
+export const createFeedsClient = () => {
+  const feedsUrl = getServiceUrl('feeds')
+  
+  debugLog(`Feeds API URL: ${feedsUrl}`)
+  
+  return axios.create({
+    baseURL: feedsUrl,
+    timeout: API_CONFIG.timeout,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+}
+
+// 기본 API 클라이언트 내보내기
 export default apiClient 
