@@ -28,10 +28,10 @@ async def lifespan(app: FastAPI):
     # 시작 시
     logger.info("🚀 Member Service 시작 중...")
     
-    # 데이터베이스 테이블 생성
+    # 기존 테이블 사용 (테이블 생성 비활성화)
     try:
-        Base.metadata.create_all(bind=engine)
-        logger.info("✅ 데이터베이스 테이블 생성 완료")
+        # Base.metadata.create_all(bind=engine)  # 비활성화: 기존 Auth Service 테이블 사용
+        logger.info("✅ 기존 테이블 사용 (테이블 생성 생략)")
         
         # 데이터베이스 연결 확인
         if await check_database_connection():

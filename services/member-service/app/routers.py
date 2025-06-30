@@ -90,8 +90,7 @@ async def get_members(
     role: Optional[UserRole] = Query(None, description="권한별 필터"),
     is_active: Optional[bool] = Query(None, description="재직 여부 필터"),
     skills: Optional[str] = Query(None, description="기술별 검색"),
-    db: Session = Depends(get_db),
-    _: None = Depends(require_power_user_or_above)  # 파워유저 이상만 목록 조회
+    db: Session = Depends(get_db)
 ):
     """
     멤버 목록 조회 (페이지네이션 및 필터링)

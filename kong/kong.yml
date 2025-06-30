@@ -1,6 +1,35 @@
 _format_version: "3.0"
 _transform: true
 
+# 글로벌 플러그인 - CORS 설정
+plugins:
+  - name: cors
+    config:
+      origins:
+        - "http://localhost:5174"
+        - "http://localhost:3000"
+        - "http://127.0.0.1:5174"
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - PATCH
+        - OPTIONS
+      headers:
+        - Accept
+        - Accept-Version
+        - Content-Length
+        - Content-MD5
+        - Content-Type
+        - Date
+        - Authorization
+      exposed_headers:
+        - X-Auth-Token
+      credentials: true
+      max_age: 3600
+      preflight_continue: false
+
 services:
   - name: auth-service
     url: http://auth-service:8010
@@ -8,15 +37,15 @@ services:
       - name: auth-routes
         paths: ["/api/auth"]
         strip_path: false
-        methods: [GET, POST, PUT, DELETE]
+        methods: [GET, POST, PUT, DELETE, OPTIONS]
 
   - name: member-service
     url: http://member-service:8001
     routes:
       - name: member-routes
-        paths: ["/api/members"]
+        paths: ["/api/members", "/api/members/"]
         strip_path: false
-        methods: [GET, POST, PUT, DELETE]
+        methods: [GET, POST, PUT, DELETE, OPTIONS]
 
   - name: customer-service
     url: http://customer-service:8002
@@ -24,11 +53,11 @@ services:
       - name: customer-routes
         paths: ["/api/customers"]
         strip_path: false
-        methods: [GET, POST, PUT, DELETE]
+        methods: [GET, POST, PUT, DELETE, OPTIONS]
       - name: assignment-routes
         paths: ["/api/assignments"]
         strip_path: false
-        methods: [GET, POST, PUT, DELETE]
+        methods: [GET, POST, PUT, DELETE, OPTIONS]
 
   - name: calendar-service
     url: http://calendar-service:8003
@@ -36,7 +65,7 @@ services:
       - name: calendar-routes
         paths: ["/api/events"]
         strip_path: false
-        methods: [GET, POST, PUT, DELETE]
+        methods: [GET, POST, PUT, DELETE, OPTIONS]
 
   - name: notice-service
     url: http://notice-service:8004
@@ -44,7 +73,7 @@ services:
       - name: notice-routes
         paths: ["/api/notices"]
         strip_path: false
-        methods: [GET, POST, PUT, DELETE]
+        methods: [GET, POST, PUT, DELETE, OPTIONS]
 
   - name: feeds-service
     url: http://feeds-service:8000
@@ -52,4 +81,4 @@ services:
       - name: feeds-routes
         paths: ["/api/feeds"]
         strip_path: false
-        methods: [GET, POST, PUT, DELETE] 
+        methods: [GET, POST, PUT, DELETE, OPTIONS] 

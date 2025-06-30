@@ -196,10 +196,37 @@ class AuthService:
     def get_user_by_id(self, user_id: int) -> Optional[Member]:
         """ID로 사용자 조회"""
         try:
-            return self.db.query(Member).filter(
-                Member.id == user_id,
-                Member.is_active == True
-            ).first()
+            result = self.db.execute(text('''
+                SELECT id, name, username, email, phone, password_hash, role, last_login, 
+                       position, team, skills, join_date, is_active, profile_image_url,
+                       created_at, updated_at
+                FROM member_schema.members 
+                WHERE id = :user_id AND is_active = true
+            '''), {"user_id": user_id}).fetchone()
+            
+            if not result:
+                return None
+                
+            # Member 객체 생성
+            user = Member()
+            user.id = result[0]
+            user.name = result[1]
+            user.username = result[2]
+            user.email = result[3]
+            user.phone = result[4]
+            user.password_hash = result[5]
+            user.role = UserRole(result[6])  # enum 값으로 변환
+            user.last_login = result[7]
+            user.position = result[8]
+            user.team = result[9]
+            user.skills = result[10]
+            user.join_date = result[11]
+            user.is_active = result[12]
+            user.profile_image_url = result[13]
+            user.created_at = result[14]
+            user.updated_at = result[15]
+            
+            return user
         except Exception as e:
             logger.error(f"사용자 조회 실패: {e}")
             return None

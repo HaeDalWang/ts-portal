@@ -12,10 +12,10 @@ from .database import Base
 
 
 class UserRole(str, enum.Enum):
-    """사용자 권한 레벨"""
-    ADMIN = "admin"           # 관리자: 모든 권한
-    POWER_USER = "power_user" # 파워유저: 데이터 조회/수정
-    USER = "user"             # 일반유저: 기본 조회만
+    """사용자 권한 레벨 (PostgreSQL enum과 일치)"""
+    ADMIN = "ADMIN"           # 관리자: 모든 권한
+    POWER_USER = "POWER_USER" # 파워유저: 데이터 조회/수정
+    USER = "USER"             # 일반유저: 기본 조회만
 
 
 class Member(Base):
