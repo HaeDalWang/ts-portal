@@ -36,9 +36,20 @@ def get_current_user_role(x_user_role: str = Header(..., alias="X-User-Role")) -
 
 def can_create_priority_notice(priority: str, user_role: str) -> bool:
     """중요도별 생성 권한 체크"""
-    if priority in ["caution", "important"]:
-        return user_role in ["admin", "power_user"]
-    return True  # normal은 모든 사용자가 생성 가능
+    if priority == "important":  # 긴급: admin만
+        return user_role.lower() == "admin"
+    elif priority == "caution":  # 경고: power_user 이상
+        return user_role.lower() in ["admin", "power_user"]
+    return True  # normal: 누구나 가능
+
+def can_delete_priority_notice(priority: str, user_role: str, author_id: int, current_user_id: int) -> bool:
+    """중요도별 삭제 권한 체크"""
+    if priority == "important":  # 긴급: admin만
+        return user_role.lower() == "admin"
+    elif priority == "caution":  # 경고: power_user 이상
+        return user_role.lower() in ["admin", "power_user"]
+    else:  # normal: 누구나 가능
+        return True
 
 @router.post("/", response_model=NoticeResponse, summary="공지사항 생성")
 async def create_notice(
@@ -203,11 +214,12 @@ async def delete_notice(
     if not existing_notice:
         raise HTTPException(status_code=404, detail="공지사항을 찾을 수 없습니다.")
     
-    # 권한 체크 (작성자 본인 또는 관리자만)
-    if existing_notice.author_id != current_user_id and current_user_role != "admin":
+    # 중요도별 삭제 권한 체크
+    if not can_delete_priority_notice(existing_notice.priority.value, current_user_role, existing_notice.author_id, current_user_id):
+        priority_names = {"normal": "일반", "caution": "경고", "important": "긴급"}
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="공지사항을 삭제할 권한이 없습니다."
+            detail=f"'{priority_names.get(existing_notice.priority.value, existing_notice.priority.value)}' 공지사항을 삭제할 권한이 없습니다."
         )
     
     try:
@@ -222,9 +234,9 @@ async def delete_notice(
 async def get_priority_list():
     """공지사항 중요도 목록을 조회합니다."""
     return [
-        {"value": "normal", "label": "일반", "icon": "📢", "color": "#6B7280"},
-        {"value": "caution", "label": "주의", "icon": "⚠️", "color": "#F59E0B"},
-        {"value": "important", "label": "중요", "icon": "🚨", "color": "#EF4444"}
+        {"value": "normal", "label": "일반", "icon": "📢", "color": "#6B7280", "description": "누구나 생성/삭제 가능"},
+        {"value": "caution", "label": "Warning", "icon": "⚠️", "color": "#F59E0B", "description": "Power User 이상"},
+        {"value": "important", "label": "긴급", "icon": "🚨", "color": "#EF4444", "description": "Admin만 가능"}
     ]
 
 # 라우터를 notices_router로 export

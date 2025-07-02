@@ -63,7 +63,7 @@ const router = createRouter({
     {
       path: '/notices',
       name: 'Notices',
-      component: () => import('@/views/NoticeView.vue'),
+      component: () => import('@/views/NoticesView.vue'),
       meta: {
         requiresAuth: true,
         title: '공지사항 - TS Portal'
