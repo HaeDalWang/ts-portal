@@ -89,8 +89,19 @@ services:
     url: http://calendar-service:8000
     routes:
       - name: calendar-routes
-        paths: ["/api/events", "/api/events/"]
+        paths: ["/api/events"]
         strip_path: false
+        preserve_host: true
+        methods: [GET, POST, PUT, DELETE, OPTIONS]
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: "/api/events/"
+      - name: calendar-routes-subpath
+        paths: ["/api/events/"]
+        strip_path: false
+        preserve_host: true
         methods: [GET, POST, PUT, DELETE, OPTIONS]
 
   - name: notice-service

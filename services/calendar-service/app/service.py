@@ -40,14 +40,16 @@ class CalendarService:
             event_type=event_data.event_type.value,
             start_time=event_data.start_time,
             end_time=event_data.end_time,
-            all_day=event_data.all_day,
+            is_all_day=event_data.is_all_day,
             location=event_data.location,
-            participants=event_data.participants,
             is_recurring=event_data.is_recurring,
             recurrence_rule=event_data.recurrence_rule,
-            color=event_data.color,
             created_by=event_data.created_by
         )
+        
+        # attendees 처리 (리스트나 딕셔너리 형태)
+        if event_data.attendees:
+            event.attendees = event_data.attendees
         
         self.db.add(event)
         self.db.commit()
@@ -131,7 +133,7 @@ class CalendarService:
                 title=f"{event.event_type_icon} {event.title}",
                 start=event.start_time.isoformat(),
                 end=event.end_time.isoformat() if event.end_time else None,
-                allDay=event.all_day,
+                allDay=event.is_all_day,
                 backgroundColor=member_color,
                 borderColor=member_color,
                 textColor='white',
@@ -140,7 +142,8 @@ class CalendarService:
                     'event_type_display': event.event_type_display,
                     'description': event.description,
                     'location': event.location,
-                    'participants': event.participants,
+                    'participants': ', '.join(str(attendee) for attendee in event.attendees if attendee) if event.attendees and isinstance(event.attendees, list) else '',
+                    'attendees': event.attendees,
                     'creator_id': event.created_by,
                     'duration_minutes': event.duration_minutes,
                     'status': event.status
@@ -170,6 +173,9 @@ class CalendarService:
         for field, value in update_data.items():
             if field == "event_type" and value:
                 setattr(event, field, value.value)
+            elif field == "attendees" and value is not None:
+                # attendees 필드 특별 처리
+                setattr(event, field, value)
             else:
                 setattr(event, field, value)
         
@@ -275,10 +281,7 @@ class CalendarService:
         ).count()
         
         completed_events = self.db.query(Event).filter(
-            or_(
-                Event.end_time < now,
-                and_(Event.end_time.is_(None), Event.start_time < now)
-            )
+            Event.end_time < now
         ).count()
         
         # 타입별 통계
@@ -324,10 +327,7 @@ class CalendarService:
             query = query.filter(
                 and_(
                     Event.start_time < end_datetime,
-                    or_(
-                        Event.end_time.is_(None),  # end_time이 없는 경우 (단일 이벤트)
-                        Event.end_time >= start_datetime  # end_time이 있는 경우
-                    )
+                    Event.end_time >= start_datetime
                 )
             )
         elif start_date:
@@ -338,10 +338,7 @@ class CalendarService:
             query = query.filter(
                 and_(
                     Event.start_time < end_datetime,
-                    or_(
-                        Event.end_time.is_(None),  # end_time이 없는 경우
-                        Event.end_time >= start_datetime  # end_time이 있는 경우
-                    )
+                    Event.end_time >= start_datetime
                 )
             )
         elif end_date:
@@ -365,7 +362,14 @@ class CalendarService:
     
     def _to_response(self, event: Event) -> EventResponse:
         """Event 모델을 EventResponse로 변환"""
-        # 생성자 정보는 일단 None으로 설정 (나중에 다른 서비스에서 조회)
+        # 하위 호환성을 위한 participants 문자열 계산
+        participants_str = ""
+        if event.attendees:
+            if isinstance(event.attendees, list):
+                participants_str = ', '.join(str(attendee) for attendee in event.attendees if attendee)
+            elif isinstance(event.attendees, dict):
+                participants_str = ', '.join(str(v) for v in event.attendees.values() if v)
+        
         return EventResponse(
             id=event.id,
             title=event.title,
@@ -373,16 +377,16 @@ class CalendarService:
             event_type=event.event_type,
             start_time=event.start_time,
             end_time=event.end_time,
-            all_day=event.all_day,
+            is_all_day=event.is_all_day,
             location=event.location,
-            participants=event.participants,
+            attendees=event.attendees,
             is_recurring=event.is_recurring,
             recurrence_rule=event.recurrence_rule,
-            color=event.color,
             created_by=event.created_by,
-            creator=None,  # 추후 Member Service에서 조회
             created_at=event.created_at,
             updated_at=event.updated_at,
+            creator=None,  # 추후 Member Service에서 조회
+            # 계산된 속성들
             event_type_display=event.event_type_display,
             event_type_icon=event.event_type_icon,
             default_color=event.default_color,
@@ -390,5 +394,9 @@ class CalendarService:
             is_today=event.is_today,
             is_upcoming=event.is_upcoming,
             is_ongoing=event.is_ongoing,
-            status=event.status
+            status=event.status,
+            # 하위 호환성 필드들
+            participants=participants_str,
+            all_day=event.is_all_day,
+            color=event.default_color
         ) 

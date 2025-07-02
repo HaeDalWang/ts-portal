@@ -3,7 +3,7 @@ Calendar Service Pydantic 스키마 정의
 """
 
 from datetime import datetime, date
-from typing import Optional, List
+from typing import Optional, List, Union, Any
 from pydantic import BaseModel, Field
 from enum import Enum
 
@@ -23,13 +23,12 @@ class EventBase(BaseModel):
     description: Optional[str] = Field(None, description="일정 설명")
     event_type: EventTypeEnum = Field(default=EventTypeEnum.other, description="일정 타입")
     start_time: datetime = Field(..., description="시작 시간")
-    end_time: Optional[datetime] = Field(None, description="종료 시간")
-    all_day: bool = Field(default=False, description="종일 일정 여부")
+    end_time: datetime = Field(..., description="종료 시간")
+    is_all_day: bool = Field(default=False, description="종일 일정 여부")
     location: Optional[str] = Field(None, max_length=200, description="장소")
-    participants: Optional[str] = Field(None, description="참가자 (쉼표로 구분)")
+    attendees: Optional[Union[List[str], List[dict]]] = Field(None, description="참가자 정보 (JSON 형태)")
     is_recurring: bool = Field(default=False, description="반복 일정 여부")
-    recurrence_rule: Optional[str] = Field(None, max_length=500, description="반복 규칙")
-    color: Optional[str] = Field(None, max_length=20, description="달력 표시 색상")
+    recurrence_rule: Optional[str] = Field(None, description="반복 규칙")
 
 class EventCreate(EventBase):
     """이벤트 생성 스키마"""
@@ -46,12 +45,11 @@ class EventUpdate(BaseModel):
     event_type: Optional[EventTypeEnum] = Field(None, description="일정 타입")
     start_time: Optional[datetime] = Field(None, description="시작 시간")
     end_time: Optional[datetime] = Field(None, description="종료 시간")
-    all_day: Optional[bool] = Field(None, description="종일 일정 여부")
+    is_all_day: Optional[bool] = Field(None, description="종일 일정 여부")
     location: Optional[str] = Field(None, max_length=200, description="장소")
-    participants: Optional[str] = Field(None, description="참가자 (쉼표로 구분)")
+    attendees: Optional[Union[List[str], List[dict]]] = Field(None, description="참가자 정보 (JSON 형태)")
     is_recurring: Optional[bool] = Field(None, description="반복 일정 여부")
-    recurrence_rule: Optional[str] = Field(None, max_length=500, description="반복 규칙")
-    color: Optional[str] = Field(None, max_length=20, description="달력 표시 색상")
+    recurrence_rule: Optional[str] = Field(None, description="반복 규칙")
 
 class CreatorInfo(BaseModel):
     """생성자 정보 (다른 서비스에서 가져온 정보)"""
@@ -61,13 +59,26 @@ class CreatorInfo(BaseModel):
     position: Optional[str] = None
     team: Optional[str] = None
 
-class EventResponse(EventBase):
+class EventResponse(BaseModel):
     """이벤트 응답 스키마"""
+    # 기본 필드들
     id: int
+    title: str
+    description: Optional[str] = None
+    event_type: str
+    start_time: datetime
+    end_time: datetime
+    is_all_day: bool
+    location: Optional[str] = None
+    attendees: Optional[Union[List[str], List[dict]]] = None
+    is_recurring: bool
+    recurrence_rule: Optional[str] = None
     created_by: int
-    creator: Optional[CreatorInfo] = None  # 다른 서비스에서 조회해서 채움
     created_at: datetime
     updated_at: datetime
+    
+    # 생성자 정보
+    creator: Optional[CreatorInfo] = None
     
     # 계산된 속성들
     event_type_display: str
@@ -79,8 +90,10 @@ class EventResponse(EventBase):
     is_ongoing: bool
     status: str
     
-    class Config:
-        from_attributes = True
+    # 하위 호환성 필드들 (service에서 직접 설정)
+    participants: str = Field(default="", description="참가자 문자열 (하위 호환용)")
+    all_day: bool = Field(default=False, description="종일 일정 여부 (하위 호환용)")
+    color: str = Field(default="#6B7280", description="이벤트 색상 (하위 호환용)")
 
 class EventListResponse(BaseModel):
     """이벤트 목록 응답 스키마"""

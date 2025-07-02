@@ -4,6 +4,7 @@ Calendar Service 모델 정의
 
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.sql import func
 from .database import Base
 
@@ -22,7 +23,7 @@ class Event(Base):
     
     # 시간 정보
     start_time = Column(DateTime, nullable=False, comment="시작 시간")
-    end_time = Column(DateTime, nullable=True, comment="종료 시간")
+    end_time = Column(DateTime, nullable=False, comment="종료 시간")
     
     # 장소 정보
     location = Column(String(200), comment="장소 (회의실, 온라인 링크 등)")
@@ -30,16 +31,17 @@ class Event(Base):
     # 생성자 정보 (외래키 대신 단순 ID로 저장)
     created_by = Column(Integer, nullable=False, comment="생성자 ID")
     
-    # 시스템 정보
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), comment="생성일시")
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), comment="수정일시")
+    # 참가자 정보 (데이터베이스 구조에 맞게 JSONB 사용)
+    attendees = Column(JSONB, nullable=True, comment="참가자 정보 (JSON 형태)")
     
     # 추가 필드
-    all_day = Column(Boolean, default=False, comment="종일 일정 여부")
-    participants = Column(Text, nullable=True, comment="참가자 (쉼표로 구분)")
+    is_all_day = Column(Boolean, default=False, comment="종일 일정 여부")
     is_recurring = Column(Boolean, default=False, comment="반복 일정 여부")
-    recurrence_rule = Column(String(500), nullable=True, comment="반복 규칙")
-    color = Column(String(20), nullable=True, comment="달력 표시 색상")
+    recurrence_rule = Column(Text, nullable=True, comment="반복 규칙")
+    
+    # 시스템 정보 (timezone 없이 설정)
+    created_at = Column(DateTime, server_default=func.now(), comment="생성일시")
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), comment="수정일시")
     
     def __repr__(self):
         return f"<Event(id={self.id}, title='{self.title}', start_time='{self.start_time}')>"
@@ -121,4 +123,4 @@ class Event(Base):
             'meeting': '#EF4444',   # red
             'other': '#6B7280'      # gray
         }
-        return self.color or color_map.get(self.event_type, '#6B7280') 
+        return color_map.get(self.event_type, '#6B7280') 
