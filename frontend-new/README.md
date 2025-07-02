@@ -1,260 +1,397 @@
-# TS Portal Frontend v2.0
+# TS Portal Frontend (New)
 
-> 최적화된 Vue 3 프론트엔드 - MSA 서비스 연동 최우선 설계
+> Vue 3 + TypeScript 최신 프론트엔드
 
-## 🎯 프로젝트 목표
+## 개요
 
-기존 프론트엔드의 무거움을 해결하고, **MSA 서비스들과의 완벽한 연동**을 최우선으로 하는 경량화된 새 프론트엔드 구축
+Vue 3 Composition API와 TypeScript를 활용한 최신 프론트엔드입니다. 기존 frontend를 완전히 재구성하여 성능과 유지보수성을 대폭 개선했습니다.
 
-### 핵심 설계 원칙
-- 🔗 **MSA 서비스 중심 설계** (Kong API Gateway 완전 활용)
-- ⚡ **최적화 우선** (번들 크기, 로딩 속도, 런타임 성능)
-- 🎨 **일관된 디자인** (기능 완성 후 일괄 적용)
-- 🔄 **중복 최소화** (컴포넌트, 로직, 스타일)
-- 📦 **적은 라이브러리** (필수 의존성만 사용)
-- 🛠️ **기능 중심** (디자인보다 MSA 연동 우선)
+## 🚀 주요 특징
 
-## 🏗️ 아키텍처 설계
-
-### 기술 스택 (최소화)
-- **Vue 3** (Composition API)
-- **TypeScript** (타입 안전성)
-- **Vite** (빌드 도구)
-- **CSS Modules** (스타일링)
-- **Fetch API** (HTTP 클라이언트)
-
-### 제거된 의존성
-- ❌ TailwindCSS (CSS 직접 작성)
-- ❌ Axios (Fetch API 사용)
-- ❌ Pinia (Composition API로 대체)
-- ❌ 무거운 UI 라이브러리들
+- **Vue 3 Composition API** - 더 나은 타입 추론과 로직 재사용
+- **TypeScript 100%** - 완전한 타입 안정성
+- **Composables 패턴** - 재사용 가능한 상태 관리
+- **서비스 레이어 분리** - API 호출 로직 모듈화
+- **컴포넌트 최적화** - 단일 책임 원칙 적용
 
 ## 📁 프로젝트 구조
 
 ```
 frontend-new/
 ├── src/
-│   ├── services/           # MSA 서비스별 API 레이어 ⭐
-│   │   ├── api.ts         # Kong Gateway 기본 클래스
-│   │   ├── auth.ts        # Auth Service (외부: 8081)
-│   │   ├── member.ts      # Member Service (외부: 8082)
-│   │   ├── customer.ts    # Customer Service (외부: 8083)
-│   │   ├── calendar.ts    # Calendar Service (외부: 8084)
-│   │   ├── notice.ts      # Notice Service (외부: 8085)
-│   │   └── feeds.ts       # Feeds Service (외부: 8086)
+│   ├── components/              # 재사용 가능한 컴포넌트
+│   │   ├── calendar/           # 캘린더 관련
+│   │   │   ├── EventCard.vue   # 이벤트 카드
+│   │   │   └── EventModal.vue  # 이벤트 생성/수정 모달
+│   │   ├── common/             # 공통 컴포넌트
+│   │   │   ├── BaseModal.vue   # 기본 모달
+│   │   │   ├── LoadingSpinner.vue
+│   │   │   └── ErrorMessage.vue
+│   │   ├── customer/           # 고객사 관련
+│   │   ├── layout/             # 레이아웃 컴포넌트
+│   │   │   ├── AppHeader.vue
+│   │   │   ├── AppNavigation.vue
+│   │   │   └── AppSidebar.vue
+│   │   ├── member/             # 팀원 관련
+│   │   └── notices/            # 공지사항 관련
 │   │
-│   ├── components/         # 기능별 컴포넌트
-│   │   ├── auth/          # 로그인/인증 관련
-│   │   ├── member/        # 팀원 관리 컴포넌트
-│   │   ├── customer/      # 고객사 관리 컴포넌트
-│   │   ├── calendar/      # 일정 관리 컴포넌트
-│   │   ├── notice/        # 공지사항 컴포넌트
-│   │   ├── feeds/         # AWS 피드 컴포넌트
-│   │   └── common/        # 공통 컴포넌트
+│   ├── composables/            # Vue 3 Composables
+│   │   ├── useAuth.ts         # 인증 관련 상태/로직
+│   │   ├── useCalendar.ts     # 캘린더 상태/로직
+│   │   ├── useCustomer.ts     # 고객사 상태/로직
+│   │   ├── useFeeds.ts        # 피드 상태/로직
+│   │   ├── useMember.ts       # 팀원 상태/로직
+│   │   └── useNotices.ts      # 공지사항 상태/로직
 │   │
-│   ├── views/             # 페이지 컴포넌트 (7개)
-│   │   ├── LoginView.vue
-│   │   ├── DashboardView.vue
-│   │   ├── MemberView.vue
-│   │   ├── CustomerView.vue
-│   │   ├── CalendarView.vue
-│   │   ├── NoticeView.vue
-│   │   └── FeedsView.vue
+│   ├── services/              # API 서비스 레이어
+│   │   ├── api.ts            # Kong Gateway API 클라이언트
+│   │   ├── auth.ts           # 인증 서비스
+│   │   ├── calendar.ts       # 캘린더 서비스
+│   │   ├── customer.ts       # 고객사 서비스
+│   │   ├── feeds.ts          # 피드 서비스
+│   │   ├── member.ts         # 팀원 서비스
+│   │   └── notices.ts        # 공지사항 서비스
 │   │
-│   ├── composables/       # 재사용 로직 (Vue 3 Composables)
-│   │   ├── useAuth.ts     # 인증 상태 관리
-│   │   ├── useApi.ts      # API 호출 공통 로직
-│   │   └── useError.ts    # 에러 처리
+│   ├── types/                 # TypeScript 타입 정의
+│   │   ├── api.ts            # 공통 API 타입
+│   │   ├── auth.ts           # 인증 관련 타입
+│   │   ├── calendar.ts       # 캘린더 타입
+│   │   ├── customer.ts       # 고객사 타입
+│   │   ├── feeds.ts          # 피드 타입
+│   │   ├── member.ts         # 팀원 타입
+│   │   └── notices.ts        # 공지사항 타입
 │   │
-│   ├── utils/             # 유틸리티 함수
-│   │   ├── jwt.ts         # JWT 토큰 관리
-│   │   ├── storage.ts     # LocalStorage 관리
-│   │   └── format.ts      # 데이터 포맷팅
+│   ├── views/                 # 페이지 컴포넌트
+│   │   ├── AuthView.vue      # 로그인 페이지
+│   │   ├── AwsFeedsView.vue  # AWS 피드 페이지
+│   │   ├── CalendarView.vue  # 캘린더 페이지
+│   │   ├── CustomerView.vue  # 고객사 관리 페이지
+│   │   ├── DashboardView.vue # 대시보드
+│   │   ├── MemberView.vue    # 팀원 관리 페이지
+│   │   └── NoticesView.vue   # 공지사항 페이지
 │   │
-│   ├── styles/            # CSS 스타일
-│   │   ├── global.css     # 글로벌 스타일
-│   │   ├── variables.css  # CSS 변수
-│   │   └── components/    # 컴포넌트별 CSS
+│   ├── router/               # Vue Router 설정
+│   │   └── index.ts         # 라우트 정의
 │   │
-│   ├── types/             # TypeScript 타입 정의
-│   │   ├── auth.ts
-│   │   ├── member.ts
-│   │   ├── customer.ts
-│   │   └── api.ts
+│   ├── styles/              # 스타일
+│   │   ├── global.css       # 전역 스타일
+│   │   └── variables.css    # CSS 변수
 │   │
-│   ├── router/            # Vue Router 설정
-│   │   └── index.ts
+│   ├── utils/               # 유틸리티
+│   │   └── jwt.ts          # JWT 토큰 처리
 │   │
-│   ├── App.vue            # 루트 컴포넌트
-│   └── main.ts            # 엔트리 포인트
+│   ├── config/              # 설정
+│   │   ├── api.config.ts   # API 설정
+│   │   └── app.config.ts   # 앱 설정
+│   │
+│   ├── App.vue              # 루트 컴포넌트
+│   ├── main.ts             # 앱 진입점
+│   └── vite-env.d.ts       # Vite 타입 정의
 │
-├── public/                # 정적 파일
-├── package.json           # 의존성 (최소화)
-├── vite.config.ts         # Vite 설정
-├── tsconfig.json          # TypeScript 설정
-└── README.md              # 이 문서
+├── public/                  # 정적 파일
+├── package.json
+├── tsconfig.json           # TypeScript 설정
+├── vite.config.ts          # Vite 설정
+└── README.md
 ```
 
-## 🚀 개발 로드맵
+## 🛠️ 기술 스택
 
-### Phase 1: 핵심 인프라 구축 (1주)
-1. **API Service Layer 구축** ⭐
-   - Kong Gateway 연동 기본 클래스
-   - JWT 토큰 관리 시스템
-   - 에러 핸들링 (네트워크, 인증, 비즈니스 로직)
-   - 각 MSA별 서비스 클래스 작성
+- **Vue 3.4+** - Composition API, `<script setup>`
+- **TypeScript 5.0+** - 완전한 타입 안전성
+- **Vite 5.0+** - 빠른 개발 서버 & 빌드
+- **Vue Router 4** - 타입 안전한 라우팅
+- **TailwindCSS 3** - 유틸리티 퍼스트 CSS
+- **Lucide Vue** - 아이콘 라이브러리
 
-2. **기본 프로젝트 설정**
-   - Vite + Vue 3 + TypeScript 설정
-   - 라우터 기본 구조
-   - CSS 변수 및 글로벌 스타일
-
-### Phase 2: 핵심 기능 개발 (2-3주)
-1. **Auth System (최우선)**
-   - 로그인/로그아웃 기능
-   - JWT 토큰 관리 및 갱신
-   - 라우터 가드 구현
-
-2. **각 MSA별 순차 개발**
-   - Member Service 연동 (팀원 관리)
-   - Customer Service 연동 (고객사 관리)
-   - Calendar Service 연동 (일정 관리)
-   - Notice Service 연동 (공지사항)
-   - Feeds Service 연동 (AWS 피드)
-
-### Phase 3: 최적화 및 폴리싱 (1주)
-1. **성능 최적화**
-   - 번들 크기 분석 및 최적화
-   - 컴포넌트 lazy loading
-   - API 호출 최적화
-
-2. **UI/UX 개선**
-   - 일관된 디자인 시스템 적용
-   - 반응형 디자인
-   - 접근성 개선
-
-## 🔧 핵심 설계 결정사항
-
-### 1. 상태 관리 전략
-```typescript
-// 글로벌 상태 최소화, 각 서비스별 독립적 상태 관리
-const useAuthStore = () => {
-  const user = ref<User | null>(null)
-  const token = ref<string | null>(null)
-  const isAuthenticated = computed(() => !!token.value)
-  // ...
-}
-```
-
-### 2. API 호출 패턴
-```typescript
-// Composable 기반 API 호출
-const useMembers = () => {
-  const members = ref<Member[]>([])
-  const loading = ref(false)
-  const error = ref<string | null>(null)
-  
-  const fetchMembers = async () => {
-    loading.value = true
-    try {
-      members.value = await memberService.getAll()
-    } catch (err) {
-      error.value = err.message
-    } finally {
-      loading.value = false
-    }
-  }
-  
-  return { members, loading, error, fetchMembers }
-}
-```
-
-### 3. 컴포넌트 구조
-- **중간 크기 컴포넌트** (너무 크지도 작지도 않게)
-- **기능별 그룹핑** (MSA 서비스 단위)
-- **Props 최소화** (필요한 데이터만 전달)
-
-### 4. 에러 처리 전략
-- **MSA 서비스별 개별 장애 대응**
-- **사용자 친화적 에러 메시지**
-- **네트워크 오류 vs 비즈니스 로직 오류 구분**
-- **Fallback UI 제공**
-
-## 🎯 MSA 서비스 연동 우선순위
-
-| 순서 | 서비스 | 외부 포트 | 주요 기능 | 개발 우선도 |
-|------|--------|-----------|-----------|-------------|
-| 1 | Auth Service | 8081 | 로그인, JWT 관리 | 🔴 최우선 |
-| 2 | Member Service | 8082 | 팀원 CRUD | 🟡 높음 |
-| 3 | Customer Service | 8083 | 고객사 CRUD | 🟡 높음 |
-| 4 | Calendar Service | 8084 | 일정 CRUD | 🟢 보통 |
-| 5 | Notice Service | 8085 | 공지사항 CRUD | 🟢 보통 |
-| 6 | Feeds Service | 8086 | AWS 피드 조회 | 🔵 낮음 |
-
-## 📊 성능 목표
-
-### 번들 크기
-- **Initial Bundle**: < 200KB (gzipped)
-- **Total Assets**: < 500KB
-- **Third-party Libraries**: < 100KB
-
-### 로딩 성능
-- **First Contentful Paint**: < 1.5초
-- **Time to Interactive**: < 3초
-- **API Response Time**: < 500ms (Kong 경유)
-
-### 런타임 성능
-- **메모리 사용량**: < 50MB
-- **컴포넌트 렌더링**: < 16ms
-- **라우터 전환**: < 100ms
-
-## 🛠️ 개발 가이드라인
-
-### 코딩 스타일
-- **TypeScript Strict Mode** 사용
-- **Composition API** 우선 사용
-- **단일 책임 원칙** 준수
-- **명확한 네이밍** (기능 중심)
-
-### API 호출 규칙
-- **모든 API는 Kong Gateway 경유** (localhost:8000)
-- **에러 처리 필수** (try-catch)
-- **로딩 상태 표시** 필수
-- **JWT 토큰 자동 첨부**
-
-### 컴포넌트 규칙
-- **Props 타입 정의** 필수
-- **Emit 이벤트 명시** 필수
-- **CSS Modules** 사용
-- **접근성 고려** (semantic HTML)
-
-## 🚦 현재 상태
-
-- ✅ **설계 완료** (이 문서)
-- ✅ **기본 프로젝트 구조 생성**
-- ✅ **Kong Gateway 연동 설정** (포트 8000)
-- 🔄 **기존 프론트엔드와 병렬 개발 중**
-- 🏗️ **로그인 기능 구현 중**
+## 🚀 실행 방법
 
 ### 개발 서버 실행
 ```bash
-cd frontend-new
+# 의존성 설치
 npm install
 
-# 환경변수 설정 (선택사항)
-echo "VITE_API_BASE_URL=http://localhost:8000" > .env
+# 개발 서버 시작 (포트: 5174)
+npm run dev
 
-npm run dev  # http://localhost:5174
+# 브라우저에서 접속
+open http://localhost:5174
 ```
 
-### 환경변수 지원
-- `VITE_API_BASE_URL`: Kong Gateway URL (기본값: http://localhost:8000)
-- `VITE_APP_TITLE`: 앱 타이틀
-- `VITE_APP_ENV`: 실행 환경
-- `VITE_DEBUG_MODE`: 디버그 모드
+### 빌드
+```bash
+# 프로덕션 빌드
+npm run build
+
+# 빌드 결과 미리보기
+npm run preview
+```
+
+### 타입 체크
+```bash
+# TypeScript 타입 체크
+npm run type-check
+
+# Vue 컴포넌트 타입 체크
+npm run build-only
+```
+
+## 📚 주요 컴포넌트
+
+### 인증 (`useAuth`)
+- JWT 토큰 기반 인증
+- 자동 토큰 갱신
+- 라우트 가드
+
+```typescript
+const { login, logout, user, isAuthenticated } = useAuth()
+
+// 로그인
+await login('admin', 'admin123!')
+
+// 사용자 정보 접근
+console.log(user.value?.name)
+```
+
+### 캘린더 (`useCalendar`)
+- 일정 CRUD 작업
+- 실시간 통계
+- 타입별 필터링
+
+```typescript
+const { 
+  events, 
+  todayEvents, 
+  loading, 
+  createEvent, 
+  loadEvents 
+} = useCalendar()
+
+// 이벤트 생성
+await createEvent({
+  title: '팀 회의',
+  start_time: '2025-07-02T14:00:00',
+  end_time: '2025-07-02T15:00:00',
+  event_type: EventType.MEETING
+})
+```
+
+### 고객사 관리 (`useCustomer`)
+- 고객사 CRUD
+- 담당자 배정
+- 검색 및 필터링
+
+```typescript
+const { 
+  customers, 
+  assignments, 
+  createCustomer, 
+  assignMember 
+} = useCustomer()
+```
+
+## 🎨 컴포넌트 설계 원칙
+
+### 1. Single Responsibility
+각 컴포넌트는 하나의 책임만 가집니다.
+
+```vue
+<!-- ❌ 거대한 컴포넌트 -->
+<template>
+  <!-- 모든 기능이 한 컴포넌트에 -->
+</template>
+
+<!-- ✅ 단일 책임 컴포넌트 -->
+<template>
+  <EventCard :event="event" @edit="onEdit" />
+  <EventModal v-if="showModal" @save="onSave" />
+</template>
+```
+
+### 2. Props & Emits 타입 정의
+```vue
+<script setup lang="ts">
+interface Props {
+  event: EventResponse
+  readonly?: boolean
+}
+
+interface Emits {
+  edit: [eventId: number]
+  delete: [eventId: number]
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  readonly: false
+})
+
+const emit = defineEmits<Emits>()
+</script>
+```
+
+### 3. Composables 활용
+상태와 로직을 재사용 가능한 composables로 분리합니다.
+
+```typescript
+// composables/useModal.ts
+export function useModal() {
+  const isOpen = ref(false)
+  
+  const open = () => isOpen.value = true
+  const close = () => isOpen.value = false
+  
+  return { isOpen, open, close }
+}
+```
+
+## 🔄 상태 관리 패턴
+
+### Service Layer Pattern
+API 호출을 서비스 레이어로 분리:
+
+```typescript
+// services/calendar.ts
+export class CalendarService {
+  async getEvents(params: SearchParams): Promise<EventListResponse> {
+    return await kongApi.get<EventListResponse>('/api/events', { params })
+  }
+}
+
+// composables/useCalendar.ts
+export function useCalendar() {
+  const events = ref<EventResponse[]>([])
+  
+  const loadEvents = async () => {
+    try {
+      const response = await calendarService.getEvents()
+      events.value = response.events
+    } catch (error) {
+      // 에러 처리
+    }
+  }
+  
+  return { events, loadEvents }
+}
+```
+
+## 🚦 라우팅
+
+타입 안전한 라우팅 설정:
+
+```typescript
+// router/index.ts
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/calendar',
+    name: 'Calendar',
+    component: () => import('@/views/CalendarView.vue'),
+    meta: { requiresAuth: true }
+  }
+]
+
+// 네비게이션 가드
+router.beforeEach((to) => {
+  const { isAuthenticated } = useAuth()
+  
+  if (to.meta.requiresAuth && !isAuthenticated.value) {
+    return '/auth'
+  }
+})
+```
+
+## 🎯 성능 최적화
+
+### 1. 코드 스플리팅
+```typescript
+// 라우트 레벨 코드 스플리팅
+const CalendarView = () => import('@/views/CalendarView.vue')
+```
+
+### 2. 컴포넌트 최적화
+```vue
+<script setup lang="ts">
+// computed 활용
+const filteredEvents = computed(() => {
+  return events.value.filter(event => 
+    event.title.includes(searchQuery.value)
+  )
+})
+
+// 불필요한 re-render 방지
+const eventCardProps = computed(() => ({
+  event: props.event,
+  readonly: props.readonly
+}))
+</script>
+```
+
+## 🔧 개발 도구
+
+### VS Code 권장 확장
+- **Vue Language Features (Volar)**
+- **TypeScript Vue Plugin (Volar)**
+- **Tailwind CSS IntelliSense**
+- **Auto Rename Tag**
+
+### 설정 파일
+```json
+// .vscode/settings.json
+{
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "vue.codeActions.enabled": true,
+  "tailwindCSS.includeLanguages": {
+    "vue": "html",
+    "vue-html": "html"
+  }
+}
+```
+
+## 🐛 디버깅
+
+### Vue DevTools
+Vue 3 DevTools를 사용하여 상태를 모니터링할 수 있습니다.
+
+### 로그 레벨
+```typescript
+// config/app.config.ts
+export const APP_CONFIG = {
+  LOG_LEVEL: import.meta.env.DEV ? 'debug' : 'error'
+}
+
+// 서비스에서 로깅
+console.log('📅 이벤트 로드 성공:', events.length, '개')
+```
+
+## 🚀 배포
+
+### 빌드 최적화
+```bash
+# 프로덕션 빌드
+npm run build
+
+# 빌드 결과 확인
+ls -la dist/
+```
+
+### 환경 변수
+```bash
+# .env.production
+VITE_API_BASE_URL=https://api.tsportal.com
+VITE_APP_VERSION=1.4.0
+```
+
+## 📈 향후 계획
+
+- [ ] **PWA 지원** - 오프라인 캐싱, 푸시 알림
+- [ ] **다크 테마** - 테마 전환 기능
+- [ ] **국제화 (i18n)** - 다국어 지원
+- [ ] **E2E 테스트** - Playwright 도입
+- [ ] **Storybook** - 컴포넌트 문서화
 
 ---
 
-**Goal**: MSA 서비스들과 완벽하게 연동되는 경량화된 프론트엔드  
-**Timeline**: 4-5주 예상  
-**Success Criteria**: 기존 대비 50% 이상 성능 개선 
+**Version**: 1.4.0  
+**Last Updated**: 2025-07-02  
+**Port**: 5174 (Development)  
+**Build Tool**: Vite 5  
+**Framework**: Vue 3 + TypeScript
