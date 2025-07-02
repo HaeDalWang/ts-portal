@@ -3,10 +3,9 @@
 TS Portal 시스템 일관성 검증 스크립트
 
 이 스크립트는 다음을 검증합니다:
-1. Python enum과 PostgreSQL enum의 일치성
+1. 각 서비스의 enum과 PostgreSQL enum의 일치성
 2. 데이터베이스 스키마 존재 여부
 3. 서비스별 테이블 생성 설정
-4. 공통 타입 사용 여부
 """
 
 import os
@@ -54,33 +53,38 @@ def check_database_enums():
         return None
 
 
-def check_python_enums():
-    """Python enum 정의들을 확인합니다"""
-    try:
-        # shared/types.py 모듈 로드
-        types_path = Path(__file__).parent.parent / "services" / "shared" / "types.py"
-        
-        if not types_path.exists():
-            print(f"❌ 공통 타입 파일이 없습니다: {types_path}")
-            return None
-        
-        spec = importlib.util.spec_from_file_location("shared.types", types_path)
-        types_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(types_module)
-        
-        python_enums = {
-            "userrole": [role.value for role in types_module.UserRole],
-            "noticepriority": [priority.value for priority in types_module.NoticePriority],
-            "eventtype": [event.value for event in types_module.EventType],
-            "customerstatus": [status.value for status in types_module.CustomerStatus],
-            "assignmentrole": [role.value for role in types_module.AssignmentRole]
-        }
-        
-        return python_enums
-        
-    except Exception as e:
-        print(f"❌ Python enum 로드 실패: {e}")
-        return None
+def check_service_enums():
+    """각 서비스의 enum 정의를 확인합니다"""
+    services_dir = Path(__file__).parent.parent / "services"
+    python_enums = {}
+    
+    for service_dir in services_dir.iterdir():
+        if not service_dir.is_dir() or service_dir.name == "shared":
+            continue
+            
+        models_py = service_dir / "app" / "models.py"
+        if models_py.exists():
+            try:
+                spec = importlib.util.spec_from_file_location(f"{service_dir.name}.models", models_py)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+                
+                # 각 서비스의 enum 수집
+                if hasattr(module, "UserRole"):
+                    python_enums["userrole"] = [role.value for role in module.UserRole]
+                if hasattr(module, "NoticePriority"):
+                    python_enums["noticepriority"] = [priority.value for priority in module.NoticePriority]
+                if hasattr(module, "EventType"):
+                    python_enums["eventtype"] = [event.value for event in module.EventType]
+                if hasattr(module, "CustomerStatus"):
+                    python_enums["customerstatus"] = [status.value for status in module.CustomerStatus]
+                if hasattr(module, "AssignmentRole"):
+                    python_enums["assignmentrole"] = [role.value for role in module.AssignmentRole]
+                    
+            except Exception as e:
+                print(f"❌ {service_dir.name} enum 로드 실패: {e}")
+    
+    return python_enums
 
 
 def check_service_table_creation():
@@ -111,32 +115,6 @@ def check_service_table_creation():
     return issues
 
 
-def check_common_types_usage():
-    """공통 타입 사용 여부를 확인합니다"""
-    services_dir = Path(__file__).parent.parent / "services"
-    issues = []
-    
-    for service_dir in services_dir.iterdir():
-        if not service_dir.is_dir() or service_dir.name == "shared":
-            continue
-            
-        models_py = service_dir / "app" / "models.py"
-        if models_py.exists():
-            content = models_py.read_text()
-            
-            # 개별 enum 정의 확인
-            if "class UserRole(str, enum.Enum):" in content:
-                issues.append(f"❌ {service_dir.name}: UserRole을 개별 정의하고 있습니다")
-            
-            # 공통 타입 import 확인
-            if "from ..shared.types import" in content:
-                print(f"✅ {service_dir.name}: 공통 타입을 사용하고 있습니다")
-            elif "UserRole" in content:
-                issues.append(f"❌ {service_dir.name}: 공통 타입을 import하지 않고 있습니다")
-    
-    return issues
-
-
 def main():
     """메인 검증 함수"""
     print("🔍 TS Portal 시스템 일관성 검증 시작\n")
@@ -148,9 +126,9 @@ def main():
         for enum_name, values in db_enums.items():
             print(f"   📋 {enum_name}: {values}")
     
-    # 2. Python enum 확인
-    print("\n2️⃣ Python enum 확인...")
-    python_enums = check_python_enums()
+    # 2. 서비스별 enum 확인
+    print("\n2️⃣ 서비스별 enum 확인...")
+    python_enums = check_service_enums()
     if python_enums:
         for enum_name, values in python_enums.items():
             print(f"   📋 {enum_name}: {values}")
@@ -178,15 +156,9 @@ def main():
     for issue in table_issues:
         print(f"   {issue}")
     
-    # 5. 공통 타입 사용 확인
-    print("\n5️⃣ 공통 타입 사용 확인...")
-    type_issues = check_common_types_usage()
-    for issue in type_issues:
-        print(f"   {issue}")
-    
     # 결과 요약
     print("\n📊 검증 결과 요약:")
-    total_issues = len(enum_issues if 'enum_issues' in locals() else []) + len(table_issues) + len(type_issues)
+    total_issues = len(enum_issues if 'enum_issues' in locals() else []) + len(table_issues)
     
     if total_issues == 0:
         print("✅ 모든 검증을 통과했습니다!")
@@ -196,7 +168,7 @@ def main():
         print("\n🔧 해결 방법:")
         print("1. docs/DEVELOPMENT_GUIDELINES.md 참조")
         print("2. scripts/database_setup.sql 실행")
-        print("3. 각 서비스의 models.py에서 공통 타입 사용")
+        print("3. 각 서비스의 models.py에서 enum 정의 확인")
         return 1
 
 

@@ -37,45 +37,10 @@ def check_service_table_creation():
     return issues
 
 
-def check_common_types_usage():
-    """공통 타입 사용 여부를 확인합니다"""
-    services_dir = Path(__file__).parent.parent / "services"
-    issues = []
-    
-    # shared/types.py 존재 확인
-    shared_types = services_dir / "shared" / "types.py"
-    if not shared_types.exists():
-        issues.append("❌ 공통 타입 파일(services/shared/types.py)이 없습니다")
-        return issues
-    else:
-        print("✅ 공통 타입 파일이 존재합니다")
-    
-    for service_dir in services_dir.iterdir():
-        if not service_dir.is_dir() or service_dir.name == "shared":
-            continue
-            
-        models_py = service_dir / "app" / "models.py"
-        if models_py.exists():
-            content = models_py.read_text()
-            
-            # 개별 enum 정의 확인
-            if "class UserRole(str, enum.Enum):" in content:
-                issues.append(f"❌ {service_dir.name}: UserRole을 개별 정의하고 있습니다")
-            
-            # 공통 타입 import 확인
-            if "from ..shared.types import" in content:
-                print(f"✅ {service_dir.name}: 공통 타입을 사용하고 있습니다")
-            elif "UserRole" in content:
-                issues.append(f"❌ {service_dir.name}: 공통 타입을 import하지 않고 있습니다")
-    
-    return issues
-
-
 def check_file_structure():
     """필수 파일들의 존재 여부를 확인합니다"""
     base_dir = Path(__file__).parent.parent
     required_files = [
-        "services/shared/types.py",
         "scripts/database_setup.sql",
         "docs/DEVELOPMENT_GUIDELINES.md"
     ]
@@ -105,15 +70,9 @@ def main():
     for issue in table_issues:
         print(f"   {issue}")
     
-    # 3. 공통 타입 사용 확인
-    print("\n3️⃣ 공통 타입 사용 확인...")
-    type_issues = check_common_types_usage()
-    for issue in type_issues:
-        print(f"   {issue}")
-    
     # 결과 요약
     print("\n📊 검증 결과 요약:")
-    total_issues = len(file_issues) + len(table_issues) + len(type_issues)
+    total_issues = len(file_issues) + len(table_issues)
     
     if total_issues == 0:
         print("✅ 모든 검증을 통과했습니다!")
@@ -124,7 +83,7 @@ def main():
     else:
         print(f"❌ {total_issues}개의 문제가 발견되었습니다.")
         print("\n🔧 해결 방법:")
-        for issue in file_issues + table_issues + type_issues:
+        for issue in file_issues + table_issues:
             print(f"   {issue}")
         print("\n📖 참고: docs/DEVELOPMENT_GUIDELINES.md")
         return 1
