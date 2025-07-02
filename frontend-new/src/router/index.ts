@@ -72,7 +72,7 @@ const router = createRouter({
     {
       path: '/feeds',
       name: 'Feeds',
-      component: () => import('@/views/FeedsView.vue'),
+      component: () => import('@/views/AwsFeedsView.vue'),
       meta: {
         requiresAuth: true,
         title: 'AWS 피드 - TS Portal'

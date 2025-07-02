@@ -152,6 +152,18 @@ async def get_all_feeds(limit: int = 5):
     }
 
 
+@feeds_router.get("/latest")
+async def get_latest_news(limit: int = 3):
+    """오늘의 AWS 소식 (가장 간단한 버전)"""
+    items = await fetch_feed(AWS_FEEDS["aws-news"]["url"], limit)
+    
+    return {
+        "latest_news": items,
+        "total": len(items),
+        "timestamp": datetime.now().isoformat()
+    }
+
+
 @feeds_router.get("/{feed_id}")
 async def get_feed(feed_id: str, limit: int = 10):
     """특정 피드의 최신 소식을 가져옵니다."""
@@ -166,18 +178,6 @@ async def get_feed(feed_id: str, limit: int = 10):
         "feed_name": feed_info["name"],
         "description": feed_info["description"],
         "items": items,
-        "total": len(items),
-        "timestamp": datetime.now().isoformat()
-    }
-
-
-@feeds_router.get("/latest")
-async def get_latest_news(limit: int = 3):
-    """오늘의 AWS 소식 (가장 간단한 버전)"""
-    items = await fetch_feed(AWS_FEEDS["aws-news"]["url"], limit)
-    
-    return {
-        "latest_news": items,
         "total": len(items),
         "timestamp": datetime.now().isoformat()
     }
