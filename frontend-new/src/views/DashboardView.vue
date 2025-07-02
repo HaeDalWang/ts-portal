@@ -89,7 +89,7 @@
               <div class="info-grid">
                 <div class="info-item">
                   <span class="info-label">Kong Gateway:</span>
-                  <span class="info-value">localhost:8080</span>
+                  <span class="info-value">localhost:8000</span>
                 </div>
                 <div class="info-item">
                   <span class="info-label">Frontend:</span>

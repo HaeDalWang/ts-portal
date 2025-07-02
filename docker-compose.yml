@@ -48,95 +48,20 @@ services:
     volumes:
       - ./kong:/kong/declarative
     ports:
-      - "8080:8000"  # 프록시 포트 (기존 API Gateway와 동일)
-      - "8888:8001"  # 관리 포트
+      - "8000:8000"  # 프록시 포트 (기존 API Gateway와 동일)
+      - "8001:8001"  # 관리 포트
+      - "8002:8002"  # WebUI
     networks:
       - ts-portal-network
 
-  # Notice Service (첫 번째 마이크로서비스!)
-  notice-service:
-    build:
-      context: ./services/notice-service
-      dockerfile: Dockerfile
-    container_name: ts-portal-notice-service
-    ports:
-      - "8004:8004"
-    environment:
-      - PYTHONPATH=/app
-      - DATABASE_URL=postgresql://tsportal:tsportal123!@postgres:5432/tsportal
-    depends_on:
-      postgres:
-        condition: service_healthy
-    volumes:
-      - ./logs/notice-service:/app/logs
-    networks:
-      - ts-portal-network
-
-  # Calendar Service (두 번째 마이크로서비스!)
-  calendar-service:
-    build:
-      context: ./services/calendar-service
-      dockerfile: Dockerfile
-    container_name: ts-portal-calendar-service
-    ports:
-      - "8003:8003"
-    environment:
-      - PYTHONPATH=/app
-      - DATABASE_URL=postgresql://tsportal:tsportal123!@postgres:5432/tsportal
-    depends_on:
-      postgres:
-        condition: service_healthy
-    volumes:
-      - ./logs/calendar-service:/app/logs
-    networks:
-      - ts-portal-network
-
-  # Customer Service (세 번째 마이크로서비스!)
-  customer-service:
-    build:
-      context: ./services/customer-service
-      dockerfile: Dockerfile
-    container_name: ts-portal-customer-service
-    ports:
-      - "8002:8002"
-    environment:
-      - PYTHONPATH=/app
-      - DATABASE_URL=postgresql://tsportal:tsportal123!@postgres:5432/tsportal
-    depends_on:
-      postgres:
-        condition: service_healthy
-    volumes:
-      - ./logs/customer-service:/app/logs
-    networks:
-      - ts-portal-network
-
-  # Member Service (네 번째 마이크로서비스!)
-  member-service:
-    build:
-      context: ./services/member-service
-      dockerfile: Dockerfile
-    container_name: ts-portal-member-service
-    ports:
-      - "8001:8001"
-    environment:
-      - PYTHONPATH=/app
-      - DATABASE_URL=postgresql://tsportal:tsportal123!@postgres:5432/tsportal
-    depends_on:
-      postgres:
-        condition: service_healthy
-    volumes:
-      - ./logs/member-service:/app/logs
-    networks:
-      - ts-portal-network
-
-  # Auth Service (다섯 번째 마이크로서비스!)
+  # Auth Service (인증/인가 서비스)
   auth-service:
     build:
       context: ./services/auth-service
       dockerfile: Dockerfile
     container_name: ts-portal-auth-service
     ports:
-      - "8010:8010"
+      - "8081:8000"
     environment:
       - PYTHONPATH=/app
       - DATABASE_URL=postgresql://tsportal:tsportal123!@postgres:5432/tsportal
@@ -150,14 +75,90 @@ services:
     networks:
       - ts-portal-network
 
-  # 📰 Feeds Service (경량화된 AWS 소식 수집)
+  # Member Service (팀원 관리 서비스)
+  member-service:
+    build:
+      context: ./services/member-service
+      dockerfile: Dockerfile
+    container_name: ts-portal-member-service
+    ports:
+      - "8082:8000"
+    environment:
+      - PYTHONPATH=/app
+      - DATABASE_URL=postgresql://tsportal:tsportal123!@postgres:5432/tsportal
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./logs/member-service:/app/logs
+    networks:
+      - ts-portal-network
+
+  # Customer Service (고객사 관리 서비스)
+  customer-service:
+    build:
+      context: ./services/customer-service
+      dockerfile: Dockerfile
+    container_name: ts-portal-customer-service
+    ports:
+      - "8083:8000"
+    environment:
+      - PYTHONPATH=/app
+      - DATABASE_URL=postgresql://tsportal:tsportal123!@postgres:5432/tsportal
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./logs/customer-service:/app/logs
+    networks:
+      - ts-portal-network
+
+  # Calendar Service (일정 관리 서비스)
+  calendar-service:
+    build:
+      context: ./services/calendar-service
+      dockerfile: Dockerfile
+    container_name: ts-portal-calendar-service
+    ports:
+      - "8084:8000"
+    environment:
+      - PYTHONPATH=/app
+      - DATABASE_URL=postgresql://tsportal:tsportal123!@postgres:5432/tsportal
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./logs/calendar-service:/app/logs
+    networks:
+      - ts-portal-network
+
+  # Notice Service (공지사항 서비스)
+  notice-service:
+    build:
+      context: ./services/notice-service
+      dockerfile: Dockerfile
+    container_name: ts-portal-notice-service
+    ports:
+      - "8085:8000"
+    environment:
+      - PYTHONPATH=/app
+      - DATABASE_URL=postgresql://tsportal:tsportal123!@postgres:5432/tsportal
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./logs/notice-service:/app/logs
+    networks:
+      - ts-portal-network
+
+  # Feeds Service (AWS 뉴스 피드 서비스)
   feeds-service:
     build:
       context: ./services/feeds-service
       dockerfile: Dockerfile
     container_name: ts-portal-feeds-service
     ports:
-      - "8000:8000"
+      - "8086:8000"
     environment:
       - PYTHONPATH=/app
     volumes:

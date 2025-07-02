@@ -56,7 +56,7 @@
       <!-- 개발용 정보 -->
       <div class="dev-info">
         <p class="text-sm text-secondary">개발용 계정: admin / admin</p>
-        <p class="text-xs text-tertiary">Kong Gateway: localhost:8080</p>
+        <p class="text-xs text-tertiary">Kong Gateway: localhost:8000</p>
       </div>
     </div>
   </div>

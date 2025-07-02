@@ -11,12 +11,18 @@ export class KongApiClient {
   private defaultHeaders: Record<string, string>
   private authToken?: string
 
-  constructor(baseUrl = 'http://localhost:8080') {
-    this.baseUrl = baseUrl
+  constructor(baseUrl?: string) {
+    // 환경변수에서 API URL 가져오기, 없으면 기본값 사용
+    this.baseUrl = baseUrl || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
     this.timeout = 10000 // 10초
     this.defaultHeaders = {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
+    }
+    
+    // 개발 환경에서 API URL 로깅
+    if (import.meta.env.DEV) {
+      console.log('🔧 API Base URL:', this.baseUrl)
     }
   }
 
@@ -37,6 +43,29 @@ export class KongApiClient {
   }
 
   /**
+   * 현재 사용자 정보 헤더 추가
+   */
+  private async addUserHeaders(): Promise<Record<string, string>> {
+    const userHeaders: Record<string, string> = {}
+    
+    try {
+      // JWT에서 사용자 정보 가져오기
+      const { jwtManager } = await import('@/utils/jwt')
+      const user = jwtManager.getUser()
+      
+      if (user && typeof user === 'object' && 'id' in user && 'role' in user) {
+        userHeaders['X-User-ID'] = String(user.id)
+        userHeaders['X-User-Role'] = String(user.role)
+        console.log('🔐 사용자 헤더 추가:', { userId: user.id, role: user.role })
+      }
+    } catch (error) {
+      console.warn('⚠️ 사용자 헤더 추가 실패:', error)
+    }
+    
+    return userHeaders
+  }
+
+  /**
    * HTTP 요청 실행
    */
   private async request<T>(
@@ -46,10 +75,14 @@ export class KongApiClient {
   ): Promise<T> {
     const { data, headers: customHeaders, timeout = 10000, signal } = options
 
+    // 사용자 정보 헤더 추가
+    const userHeaders = await this.addUserHeaders()
+
     // 기본 헤더 설정
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...this.defaultHeaders,
+      ...userHeaders,
       ...customHeaders
     }
 

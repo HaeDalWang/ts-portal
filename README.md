@@ -38,7 +38,7 @@ Vue 3 + FastAPI 마이크로서비스 기반의 팀 관리 포털입니다.
 
 ```
 ts-portal/
-├── frontend/                    # Vue 3 프론트엔드
+├── frontend/                    # Vue 3 프론트엔드 (현재 운영)
 │   ├── src/
 │   │   ├── components/         # 32개 컴포넌트 (모듈화)
 │   │   │   ├── layout/        # 레이아웃 컴포넌트
@@ -52,13 +52,16 @@ ts-portal/
 │   │   └── router/            # Vue Router 설정
 │   └── package.json
 │
+├── frontend-new/                # Vue 3 경량화 버전 (개발 중)
+│   └── 최적화된 새 프론트엔드 (포트: 5174)
+│
 ├── services/                    # 마이크로서비스
-│   ├── auth-service/          # 인증/인가 (8010)
-│   ├── member-service/        # 팀원 관리 (8001)
-│   ├── customer-service/      # 고객사 관리 (8002)
-│   ├── calendar-service/      # 일정 관리 (8003)
-│   ├── notice-service/        # 공지사항 (8004)
-│   └── feeds-service/         # AWS 피드 (8000)
+│   ├── auth-service/          # 인증/인가 (8081)
+│   ├── member-service/        # 팀원 관리 (8082)
+│   ├── customer-service/      # 고객사 관리 (8083)
+│   ├── calendar-service/      # 일정 관리 (8084)
+│   ├── notice-service/        # 공지사항 (8085)
+│   └── feeds-service/         # AWS 피드 (8086)
 │
 ├── kong/                      # Kong API Gateway 설정
 │   └── kong.yml              # 라우팅 규칙
@@ -90,7 +93,7 @@ docker-compose up postgres redis kong -d
 # 개별 서비스 개발
 cd services/auth-service
 uv sync
-uv run uvicorn app.main:app --reload --port 8010
+uv run uvicorn app.main:app --reload --port 8000
 
 # 프론트엔드 개발
 cd frontend
@@ -102,11 +105,12 @@ npm run dev
 
 | 서비스 | URL | 설명 |
 |--------|-----|------|
-| **포털 사이트** | http://localhost:5173 | Vue 3 프론트엔드 |
-| **API Gateway** | http://localhost:8080 | Kong 통합 API |
-| **API 문서** | http://localhost:8010/docs | Auth Service API |
+| **포털 사이트** | http://localhost:5173 | Vue 3 프론트엔드 (현재 운영) |
+| **포털 사이트 (New)** | http://localhost:5174 | Vue 3 경량화 버전 (개발 중) |
+| **API Gateway** | http://localhost:8000 | Kong 통합 API |
+| **API 문서** | http://localhost:8081/docs | Auth Service API |
 | **pgAdmin** | http://localhost:5050 | DB 관리 도구 |
-| **Kong 관리** | http://localhost:8888 | Kong Admin API |
+| **Kong 관리** | http://localhost:8001 | Kong Admin API |
 
 ### 기본 로그인 정보
 - **아이디**: `admin`
@@ -129,8 +133,12 @@ npm run dev
 ### Kong 라우팅
 ```yaml
 # Kong이 모든 요청을 적절한 마이크로서비스로 라우팅
-/api/auth/login → auth-service:8010/api/auth/login
-/api/members/   → member-service:8001/api/members/
+# (모든 서비스는 내부적으로 8000 포트 사용)
+/api/auth/login → auth-service:8000/api/auth/login
+/api/members/   → member-service:8000/api/members/
+/api/customers/ → customer-service:8000/api/customers/
+/api/events/    → calendar-service:8000/api/events/
+/api/notices/   → notice-service:8000/api/notices/
 /api/feeds/     → feeds-service:8000/api/feeds/
 ```
 
@@ -179,18 +187,23 @@ open http://localhost:5173
 
 | 서비스 | 포트 | 컨테이너명 | 상태 |
 |--------|------|------------|------|
-| **Kong Gateway** | 8080 | ts-portal-kong | ✅ 운영 |
-| **Auth Service** | 8010 | ts-portal-auth-service | ✅ 운영 |
-| **Member Service** | 8001 | ts-portal-member-service | ✅ 운영 |
-| **Customer Service** | 8002 | ts-portal-customer-service | ✅ 운영 |
-| **Calendar Service** | 8003 | ts-portal-calendar-service | ✅ 운영 |
-| **Notice Service** | 8004 | ts-portal-notice-service | ✅ 운영 |
-| **Feeds Service** | 8000 | ts-portal-feeds-service | ✅ 운영 |
+| **Kong Gateway** | 8000 | ts-portal-kong | ✅ 운영 |
+| **Auth Service** | 8081 | ts-portal-auth-service | ✅ 운영 |
+| **Member Service** | 8082 | ts-portal-member-service | ✅ 운영 |
+| **Customer Service** | 8083 | ts-portal-customer-service | ✅ 운영 |
+| **Calendar Service** | 8084 | ts-portal-calendar-service | ✅ 운영 |
+| **Notice Service** | 8085 | ts-portal-notice-service | ✅ 운영 |
+| **Feeds Service** | 8086 | ts-portal-feeds-service | ✅ 운영 |
 | **PostgreSQL** | 5432 | ts-portal-postgres | ✅ 운영 |
 | **Redis** | 6379 | ts-portal-redis | ✅ 운영 |
 | **pgAdmin** | 5050 | ts-portal-pgadmin | ✅ 운영 |
 
 ## 🔄 최근 주요 업데이트
+
+### v1.3.0 (2025-01-02)
+- ✅ **서비스 포트 정리** (8081~8086으로 순차 배치)
+- ✅ **내부 포트 통일** (모든 서비스 내부 8000 포트 사용)
+- ✅ **frontend-new 개발 시작** (경량화된 새 버전)
 
 ### v1.2.0 (2025-06-29)
 - ✅ **Kong API Gateway 도입** (기존 자체 개발 API Gateway 대체)
@@ -211,4 +224,4 @@ open http://localhost:5173
 
 **Created by**: Seungdo Bae (TS Team)  
 **Contact**: Saltware CSG  
-**Version**: 1.2.0 (Kong Gateway)
+**Version**: 1.3.0 (Port Standardization)

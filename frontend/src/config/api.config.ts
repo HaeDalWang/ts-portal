@@ -30,7 +30,7 @@ export const getCurrentEnvironment = (): Environment => {
 
 // 환경변수에서 API 설정 가져오기
 const getApiConfig = (): ApiConfig => {
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
   const timeout = parseInt(import.meta.env.VITE_API_TIMEOUT || '10000')
 
   // API Gateway를 통한 통합 접근이 기본

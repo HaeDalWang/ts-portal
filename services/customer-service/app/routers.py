@@ -30,13 +30,9 @@ def get_current_user_role(x_user_role: str = Header(..., alias="X-User-Role")) -
 @customers_router.post("/", response_model=CustomerResponse, summary="고객사 생성")
 async def create_customer(
     customer_data: CustomerCreate,
-    service: CustomerService = Depends(get_customer_service),
-    current_user_role: str = Depends(get_current_user_role)
+    service: CustomerService = Depends(get_customer_service)
 ):
-    # 권한 체크 (관리자 또는 파워유저만)
-    if current_user_role not in ["admin", "power_user"]:
-        raise HTTPException(status_code=403, detail="고객사 생성 권한이 없습니다.")
-    
+    # 누구나 고객사 생성 가능
     try:
         return service.create_customer(customer_data)
     except ValueError as e:

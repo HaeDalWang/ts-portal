@@ -33,5 +33,5 @@ app.mount('#app')
 initializeApp()
 
 console.log('🚀 TS Portal Frontend v2.0 시작됨')
-console.log('🔗 Kong Gateway:', 'http://localhost:8080')
+console.log('🔗 Kong Gateway:', 'http://localhost:8000')
 console.log('📱 Frontend:', 'http://localhost:5174') 

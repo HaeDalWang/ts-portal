@@ -47,10 +47,10 @@ USER app
 
 # 헬스체크 설정
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8010/health || exit 1
+    CMD curl -f http://localhost:8000/health || exit 1
 
 # 포트 노출
-EXPOSE 8010
+EXPOSE 8000
 
 # 환경변수 설정
 ENV PYTHONPATH=/app
@@ -58,4 +58,4 @@ ENV JWT_SECRET_KEY=your-super-secret-jwt-key-change-in-production
 ENV JWT_EXPIRE_MINUTES=1440
 
 # UV를 사용하여 애플리케이션 실행
-CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8010"] 
+CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"] 

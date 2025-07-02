@@ -31,15 +31,15 @@ COPY app/ ./app/
 RUN mkdir -p /app/logs
 
 # 포트 노출
-EXPOSE 8001
+EXPOSE 8000
 
 # 헬스체크 설정
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8001/health || exit 1
+    CMD curl -f http://localhost:8000/health || exit 1
 
 # 환경변수 설정
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
 
 # UV로 애플리케이션 실행
-CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"] 
+CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"] 

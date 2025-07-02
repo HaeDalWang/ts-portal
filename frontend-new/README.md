@@ -36,12 +36,12 @@ frontend-new/
 ├── src/
 │   ├── services/           # MSA 서비스별 API 레이어 ⭐
 │   │   ├── api.ts         # Kong Gateway 기본 클래스
-│   │   ├── auth.ts        # Auth Service (8010)
-│   │   ├── member.ts      # Member Service (8001)
-│   │   ├── customer.ts    # Customer Service (8002)
-│   │   ├── calendar.ts    # Calendar Service (8003)
-│   │   ├── notice.ts      # Notice Service (8004)
-│   │   └── feeds.ts       # Feeds Service (8000)
+│   │   ├── auth.ts        # Auth Service (외부: 8081)
+│   │   ├── member.ts      # Member Service (외부: 8082)
+│   │   ├── customer.ts    # Customer Service (외부: 8083)
+│   │   ├── calendar.ts    # Calendar Service (외부: 8084)
+│   │   ├── notice.ts      # Notice Service (외부: 8085)
+│   │   └── feeds.ts       # Feeds Service (외부: 8086)
 │   │
 │   ├── components/         # 기능별 컴포넌트
 │   │   ├── auth/          # 로그인/인증 관련
@@ -182,14 +182,14 @@ const useMembers = () => {
 
 ## 🎯 MSA 서비스 연동 우선순위
 
-| 순서 | 서비스 | 포트 | 주요 기능 | 개발 우선도 |
-|------|--------|------|-----------|-------------|
-| 1 | Auth Service | 8010 | 로그인, JWT 관리 | 🔴 최우선 |
-| 2 | Member Service | 8001 | 팀원 CRUD | 🟡 높음 |
-| 3 | Customer Service | 8002 | 고객사 CRUD | 🟡 높음 |
-| 4 | Calendar Service | 8003 | 일정 CRUD | 🟢 보통 |
-| 5 | Notice Service | 8004 | 공지사항 CRUD | 🟢 보통 |
-| 6 | Feeds Service | 8000 | AWS 피드 조회 | 🔵 낮음 |
+| 순서 | 서비스 | 외부 포트 | 주요 기능 | 개발 우선도 |
+|------|--------|-----------|-----------|-------------|
+| 1 | Auth Service | 8081 | 로그인, JWT 관리 | 🔴 최우선 |
+| 2 | Member Service | 8082 | 팀원 CRUD | 🟡 높음 |
+| 3 | Customer Service | 8083 | 고객사 CRUD | 🟡 높음 |
+| 4 | Calendar Service | 8084 | 일정 CRUD | 🟢 보통 |
+| 5 | Notice Service | 8085 | 공지사항 CRUD | 🟢 보통 |
+| 6 | Feeds Service | 8086 | AWS 피드 조회 | 🔵 낮음 |
 
 ## 📊 성능 목표
 
@@ -217,7 +217,7 @@ const useMembers = () => {
 - **명확한 네이밍** (기능 중심)
 
 ### API 호출 규칙
-- **모든 API는 Kong Gateway 경유** (localhost:8080)
+- **모든 API는 Kong Gateway 경유** (localhost:8000)
 - **에러 처리 필수** (try-catch)
 - **로딩 상태 표시** 필수
 - **JWT 토큰 자동 첨부**
@@ -231,8 +231,27 @@ const useMembers = () => {
 ## 🚦 현재 상태
 
 - ✅ **설계 완료** (이 문서)
-- ⏳ **개발 준비 중**
-- 🔄 **기존 프론트엔드와 병렬 개발**
+- ✅ **기본 프로젝트 구조 생성**
+- ✅ **Kong Gateway 연동 설정** (포트 8000)
+- 🔄 **기존 프론트엔드와 병렬 개발 중**
+- 🏗️ **로그인 기능 구현 중**
+
+### 개발 서버 실행
+```bash
+cd frontend-new
+npm install
+
+# 환경변수 설정 (선택사항)
+echo "VITE_API_BASE_URL=http://localhost:8000" > .env
+
+npm run dev  # http://localhost:5174
+```
+
+### 환경변수 지원
+- `VITE_API_BASE_URL`: Kong Gateway URL (기본값: http://localhost:8000)
+- `VITE_APP_TITLE`: 앱 타이틀
+- `VITE_APP_ENV`: 실행 환경
+- `VITE_DEBUG_MODE`: 디버그 모드
 
 ---
 
