@@ -91,12 +91,9 @@ async def get_customer(
 async def update_customer(
     customer_id: int,
     customer_data: CustomerUpdate,
-    service: CustomerService = Depends(get_customer_service),
-    current_user_role: str = Depends(get_current_user_role)
+    service: CustomerService = Depends(get_customer_service)
 ):
-    if current_user_role not in ["admin", "power_user"]:
-        raise HTTPException(status_code=403, detail="고객사 수정 권한이 없습니다.")
-    
+    # 누구나 고객사 수정 가능
     try:
         customer = service.update_customer(customer_id, customer_data)
         if not customer:
@@ -111,7 +108,8 @@ async def delete_customer(
     service: CustomerService = Depends(get_customer_service),
     current_user_role: str = Depends(get_current_user_role)
 ):
-    if current_user_role != "admin":
+    # 관리자 또는 파워유저만 삭제 가능 (대소문자 무시)
+    if current_user_role.lower() not in ["admin", "power_user"]:
         raise HTTPException(status_code=403, detail="고객사 삭제 권한이 없습니다.")
     
     success = service.delete_customer(customer_id)
@@ -131,7 +129,7 @@ async def create_assignment(
     service: AssignmentService = Depends(get_assignment_service),
     current_user_role: str = Depends(get_current_user_role)
 ):
-    if current_user_role not in ["admin", "power_user"]:
+    if current_user_role.lower() not in ["admin", "power_user"]:
         raise HTTPException(status_code=403, detail="담당자 배정 권한이 없습니다.")
     
     try:
@@ -172,7 +170,7 @@ async def update_assignment(
     service: AssignmentService = Depends(get_assignment_service),
     current_user_role: str = Depends(get_current_user_role)
 ):
-    if current_user_role not in ["admin", "power_user"]:
+    if current_user_role.lower() not in ["admin", "power_user"]:
         raise HTTPException(status_code=403, detail="담당 배정 수정 권한이 없습니다.")
     
     assignment = service.update_assignment(assignment_id, assignment_data)
@@ -186,7 +184,7 @@ async def delete_assignment(
     service: AssignmentService = Depends(get_assignment_service),
     current_user_role: str = Depends(get_current_user_role)
 ):
-    if current_user_role not in ["admin", "power_user"]:
+    if current_user_role.lower() not in ["admin", "power_user"]:
         raise HTTPException(status_code=403, detail="담당 배정 삭제 권한이 없습니다.")
     
     success = service.delete_assignment(assignment_id)
