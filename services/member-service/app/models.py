@@ -6,16 +6,15 @@ Member Service - 데이터베이스 모델
 
 from datetime import date, datetime
 from sqlalchemy import Column, Integer, String, Text, Date, DateTime, Boolean, Enum
-import enum
 
 from .database import Base
 
+# shared 모듈 import를 위한 경로 추가
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 
-class UserRole(str, enum.Enum):
-    """사용자 권한 레벨 (PostgreSQL enum과 일치)"""
-    ADMIN = "ADMIN"           # 관리자: 모든 권한
-    POWER_USER = "POWER_USER" # 파워유저: 데이터 조회/수정
-    USER = "USER"             # 일반유저: 기본 조회만
+from shared.types import UserRole, has_permission, is_admin, is_power_user_or_above
 
 
 class Member(Base):
@@ -72,17 +71,12 @@ class Member(Base):
     
     def has_permission(self, required_role: UserRole) -> bool:
         """권한 확인"""
-        role_hierarchy = {
-            UserRole.USER: 0,
-            UserRole.POWER_USER: 1,
-            UserRole.ADMIN: 2
-        }
-        return role_hierarchy.get(self.role, 0) >= role_hierarchy.get(required_role, 0)
+        return has_permission(self.role, required_role)
     
     def is_admin(self) -> bool:
         """관리자 권한 확인"""
-        return self.role == UserRole.ADMIN
+        return is_admin(self.role)
     
     def is_power_user_or_above(self) -> bool:
         """파워유저 이상 권한 확인"""
-        return self.role in [UserRole.POWER_USER, UserRole.ADMIN] 
+        return is_power_user_or_above(self.role) 

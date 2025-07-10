@@ -37,6 +37,9 @@ RUN uv sync --frozen --no-dev --no-cache
 # 애플리케이션 코드 복사
 COPY app/ ./app/
 
+# shared 모듈 복사 (상위 디렉토리에서)
+COPY ../shared/ ./shared/
+
 # 로그 디렉토리 생성
 RUN mkdir -p /app/logs
 

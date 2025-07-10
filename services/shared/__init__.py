@@ -1,0 +1,1 @@
+# Shared types and utilities for TS Portal services 
