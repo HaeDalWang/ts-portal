@@ -18,17 +18,17 @@ RUN apt-get update && apt-get install -y \
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
 # Python 프로젝트 파일 복사
-COPY pyproject.toml uv.lock* ./
+COPY services/calendar-service/pyproject.toml services/calendar-service/uv.lock* ./
 
 # UV로 의존성 설치 (가상환경 없이 시스템에 직접 설치)
 ENV UV_SYSTEM_PYTHON=1
 RUN uv sync --frozen --no-dev
 
 # 애플리케이션 코드 복사
-COPY app/ ./app/
+COPY services/calendar-service/app/ ./app/
 
-# shared 모듈 복사 (상위 디렉토리에서)
-COPY ../shared/ ./shared/
+# shared 모듈 복사
+COPY services/shared/ ./shared/
 
 # 로그 디렉토리 생성
 RUN mkdir -p /app/logs

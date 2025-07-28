@@ -27,13 +27,13 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 WORKDIR /app
 
 # 의존성 관리 파일 복사
-COPY pyproject.toml uv.lock ./
+COPY services/feeds-service/pyproject.toml services/feeds-service/uv.lock ./
 
 # UV로 의존성 설치 (캐시 없이 안전하게)
 RUN uv sync --frozen --no-dev --no-cache
 
 # 애플리케이션 코드 복사 (경량화된 단일 파일)
-COPY app/ ./app/
+COPY services/feeds-service/app/ ./app/
 
 # 로그 디렉토리 생성
 RUN mkdir -p /app/logs
